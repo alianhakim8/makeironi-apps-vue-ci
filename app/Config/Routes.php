@@ -43,6 +43,9 @@ $routes->get('/product-json', 'ProductController::productJSON');
 $routes->get('/product-all-json', 'ProductController::getAllProductJSON');
 $routes->get('/product-detail-json/(:any)', 'ProductController::productDetailJSON/$1');
 
+// user
+$routes->get('/user/login', 'UserController::login');
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

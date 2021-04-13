@@ -70,6 +70,10 @@ body {
     margin-left: 5px;
 }
 
+.text-justify {
+    text-align: justify;
+}
+
 
 /* #product-detail {
     margin-bottom: 20%
@@ -90,8 +94,8 @@ body {
 
 /* footer */
 
-.footer {
-    margin-top: 5%;
+.wa-chat-box-poweredby {
+    display: none;
 }
 
 .footer-1 {

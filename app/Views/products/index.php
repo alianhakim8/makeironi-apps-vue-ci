@@ -2,6 +2,7 @@
 <?= $this->section('content'); ?>
 
 <div id="app">
+    <!-- carousel -->
     <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
@@ -9,6 +10,7 @@
             </div>
         </div>
     </div>
+    <!-- content -->
     <div class="container">
         <form>
             <input v-model='keyword' type="text" class="form-control mt-5" id="search" aria-describedby="searchProduct" placeholder="Cari...">
@@ -87,6 +89,7 @@
             </div>
         </div>
     </div>
+
 </div>
 <script src="/js/products/product.js"></script>
 <?= $this->endSection(); ?>

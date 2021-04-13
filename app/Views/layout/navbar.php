@@ -28,7 +28,7 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li>
-                    <a href="#" class="nav-link"><strong>Login</strong></a>
+                    <a href="/user/login" class="nav-link"><strong>Login</strong></a>
                 </li>
                 <li class="cart-desktop">
                     <button type="button" class="btn btn-dark">Cart <span class="badge badge-dark">0</span></button>
