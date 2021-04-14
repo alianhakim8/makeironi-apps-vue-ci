@@ -1,6 +1,6 @@
 <!-- first navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark top-nav">
-    <div class="container text-light">
+<nav class="navbar navbar-expand-lg navbar-light top-nav">
+    <div class="container">
         <p id="phone-number">+62 851 5645 xxxx</p>
         <p id="response-text">Fast Response : 08.00 - 21.00 WIB</p>
         <p id="email">makeironi.web@makeironi.com</p>
@@ -8,7 +8,7 @@
 </nav>
 
 <!-- second navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light p-4">
+<nav class="navbar navbar-expand-lg navbar-light bg-green p-4">
     <div class="container">
         <a class="navbar-brand" href="/product">Make I Roni</a>
         <button class="navbar-toggler order-first" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,13 +31,13 @@
                     <a href="/user/login" class="nav-link"><strong>Login</strong></a>
                 </li>
                 <li class="cart-desktop">
-                    <button type="button" class="btn btn-dark">Cart <span class="badge badge-dark">0</span></button>
+                    <button type="button" class="btn btn-yellow">Cart <span class="badge badge-dark">0</span></button>
                 </li>
             </ul>
         </div>
         <ul class="navbar-nav ml-auto cart-mobile">
             <li>
-                <button type="button" class="btn btn-dark"><span class="badge badge-dark">0</span></button>
+                <button type="button" class="btn btn-yellow"><span class="badge badge-dark">0</span></button>
             </li>
         </ul>
     </div>

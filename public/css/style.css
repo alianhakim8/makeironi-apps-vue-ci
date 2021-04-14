@@ -10,10 +10,12 @@ body {
 
 .top-nav {
     margin: 0;
+    background-color: #393E41!important;
 }
 
 .top-nav p {
     padding-top: 10px;
+    color: white;
 }
 
 .navbar-brand {
@@ -22,6 +24,15 @@ body {
 
 .cart-mobile {
     visibility: collapse;
+}
+
+.bg-green {
+    background-color: #D3D0CB;
+}
+
+.btn-yellow,
+.bg-yellow {
+    background-color: #E7BB41!important;
 }
 
 

@@ -1,5 +1,5 @@
 var vm = new Vue({
-    el: "#product-all",
+    el: "#app",
     data: {
         // products: [{
         //     id: 1,

@@ -51,7 +51,7 @@
         <p>Produk Lainnya</p>
         <hr>
         <div id="app">
-            <div class="row mt-5">
+            <div class="row mt-5 mb-5">
                 <div class="col-md-3 col-xs-4" v-for="product in filterProduct" :key='product.id'>
                     <div class="card mt-2">
                         <div class="card-body">
@@ -64,7 +64,7 @@
                             <p>stock : {{ product.stock }}</p>
                             <div class="row">
                                 <div class="col-md-8">
-                                    <a :href="'product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
+                                    <a :href="'/product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
                                 </div>
                                 <div class="col-md-4">
                                     <button class="btn btn-dark w-100">Beli</button>
@@ -73,7 +73,6 @@
                         </div>
                     </div>
                 </div>
-                <a href="/product/all" class="nav-link">Selengkapnya</a>
             </div>
         </div>
     </div>

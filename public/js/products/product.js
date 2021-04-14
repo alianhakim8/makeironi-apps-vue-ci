@@ -18,6 +18,7 @@ var vm = new Vue({
         //     product_name: 'Roy'
         // }],
         products: [],
+        feedback_customer: [],
         keyword: "",
     },
     computed: {
@@ -33,6 +34,7 @@ var vm = new Vue({
     created: function() {
         axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
         this.getProducts();
+        this.getcustomers();
     },
     methods: {
         // get from database
@@ -40,6 +42,12 @@ var vm = new Vue({
             axios.get("/product-json").then((response) => {
                 console.log(response.data);
                 this.products = response.data;
+            });
+        },
+        getcustomers() {
+            axios.get("/customer/feedback-json").then((response) => {
+                console.log(response.data);
+                this.feedback_customer = response.data;
             });
         },
     },

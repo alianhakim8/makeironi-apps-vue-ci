@@ -36,7 +36,7 @@
                                 <a :href="'product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-dark w-100">Beli</button>
+                                <button class="btn btn-yellow w-100">Beli</button>
                             </div>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                                 <a href="/product/detail" class="btn btn-outline-dark w-100">Detail</a>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-dark w-100">Beli</button>
+                                <button class="btn btn-yellow w-100">Beli</button>
                             </div>
                         </div>
                     </div>
@@ -72,24 +72,16 @@
             </div>
         </div>
     </div>
-
-    <!-- feedback -->
-    <div class="card p-5 mt-5 bg-dark text-light rounded-0">
+    <div class="card p-5 mt-5 bg-yellow text-light rounded-0">
         <h1 class="text-center ">Feedback Customer</h1>
         <div class="container">
             <div class="row mt-2">
-                <div class="col-md-6">
-                    <p class="font-weight-bold">Nama Customer</p>
-                    <p>Pesan Feedback</p>
-                </div>
-                <div class="col-md-6">
-                    <p class="font-weight-bold">Nama Customer</p>
-                    <p>Pesan Feedback</p>
+                <div class="col-md-6" v-for="item in feedback_customer" :key='item.id'>
+                    <p>{{ item.feedback_desc}}</p>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 <script src="/js/products/product.js"></script>
 <?= $this->endSection(); ?>
