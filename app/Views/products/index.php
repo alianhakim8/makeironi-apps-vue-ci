@@ -72,12 +72,19 @@
             </div>
         </div>
     </div>
-    <div class="card p-5 mt-5 bg-yellow text-light rounded-0">
+    <div class="card p-5 mt-5 bg-dark text-light rounded-0">
         <h1 class="text-center ">Feedback Customer</h1>
         <div class="container">
-            <div class="row mt-2">
+            <div class="row mt-5">
                 <div class="col-md-6" v-for="item in feedback_customer" :key='item.id'>
-                    <p>{{ item.feedback_desc}}</p>
+                    <div class="d-flex">
+                        <img :src="'/img/' + item.photo" class="rounded-circle customer-photo">
+                        <div class="p-3">
+                            <h1>{{ item.name}}</h1>
+                            <p>{{ item.feedback_desc}}</p>
+                            <img src="https://lh3.googleusercontent.com/proxy/0i5X0rRIfYFRXJtjtmN17_4ENudQyiTuvGa6Fs3BMJIA6rEO5vyFv2XKhMRqNain3OdaIsmnx8mbvttQlvuI7kq9j4ofEmAGlk_IiHmwzaueEADuitySQTgUOpqskGess6kUN4lVC_LdQRt8" style="height:50px">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -4,6 +4,6 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class UserModel extends Model
+class CustomerModel extends Model
 {
 }

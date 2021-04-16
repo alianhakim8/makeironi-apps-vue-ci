@@ -46,7 +46,7 @@ $routes->get('/product-detail-json/(:any)', 'ProductController::productDetailJSO
 // customer
 $routes->get('/customer/login', 'CustomerController::login');
 $routes->get('/customer/feedback-json', 'CustomerController::feedbackJSON');
-
+$routes->get('/customer/customer-json', 'CustomerController::customerJSON');
 /*
  * --------------------------------------------------------------------
  * Additional Routing
