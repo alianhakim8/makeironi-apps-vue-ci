@@ -2,24 +2,10 @@ var vm = new Vue({
     prop: ["id"],
     el: "#product-detail",
     data: {
-        // products: [{
-        //     id: 1,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 2,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 3,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 4,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 5,
-        //     product_name: 'Roy'
-        // }],
         products: [],
         keyword: "",
+        stock: 0,
+        stockFromDb: 0,
     },
     computed: {
         filterProduct() {
@@ -42,7 +28,18 @@ var vm = new Vue({
             axios.get("/product-detail-json/" + id).then((response) => {
                 console.log(response.data);
                 this.products = response.data;
+                this.stockFromDb = response.data.stock;
             });
+        },
+        increase() {
+            if (this.stock != this.stockFromDb) {
+                this.stock++;
+            }
+        },
+        decrease() {
+            if (this.stock != 0) {
+                this.stock--;
+            }
         },
     },
 });

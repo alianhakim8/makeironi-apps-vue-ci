@@ -5,8 +5,13 @@
     <!-- carousel -->
     <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="bg"></div>
+            <div class="carousel-item active item">
+                <img class="d-block w-100" src="/img/carousel.jpeg" alt="First slide">
+                <div class="carousel-caption d-none d-md-block text-dark">
+                    <h1>Make (I) Roni</h1>
+                    <p>Cemilan Kriuk Gak Bikin Gemuk</p>
+                    <p>Lokal Lestari</p>
+                </div>
             </div>
         </div>
     </div>
@@ -24,10 +29,11 @@
             <div class="col-md-3 col-xs-4" v-for="product in filterProduct" :key='product.id'>
                 <div class="card mt-2">
                     <div class="card-body">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Macaroni_closeup.jpg/1200px-Macaroni_closeup.jpg" class="img-fluid">
+                        <img v-bind:src="'/img/product/'+ product.images" class="img-fluid">
                         <h5 class="mt-2">{{ product.product_name }}&nbsp;<h6>{{ product.variant }}</h6>
                         </h5>
                         <!-- field harga -->
+
                         <p>Harga : Rp. {{ product.price }}</p>
                         <!-- field stock -->
                         <p>stock : {{ product.stock }}</p>
@@ -36,7 +42,7 @@
                                 <a :href="'product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-yellow w-100">Beli</button>
+                                <a :href="'product/detail/' + product.id" class="btn btn-yellow w-100">Beli</a>
                             </div>
                         </div>
                     </div>
@@ -52,19 +58,20 @@
             <div class="col-md-3" v-for="product in filterProduct" :key='product.id'>
                 <div class="card mt-2">
                     <div class="card-body">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Macaroni_closeup.jpg/1200px-Macaroni_closeup.jpg" class="img-fluid">
+                        <img v-bind:src="'/img/product/'+ product.images" class="img-fluid">
                         <h5 class="mt-2">{{ product.product_name }}&nbsp;<h6>{{ product.variant }}</h6>
                         </h5>
                         <!-- field harga -->
                         <p>Harga : Rp. {{ product.price }}</p>
                         <!-- field stock -->
                         <p>stock : {{ product.stock }}</p>
+
                         <div class="row">
                             <div class="col-md-8">
-                                <a href="/product/detail" class="btn btn-outline-dark w-100">Detail</a>
+                                <a :href="'/product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-yellow w-100">Beli</button>
+                                <a :hreft="'/product/detail/' + product.id" class="btn btn-warning w-100">Beli</a>
                             </div>
                         </div>
                     </div>
@@ -72,18 +79,16 @@
             </div>
         </div>
     </div>
-    <div class="card p-5 mt-5 bg-dark text-light rounded-0">
-        <h1 class="text-center ">Feedback Customer</h1>
+    <div class="card p-5 mt-5 bg-dark text-light rounded-0 text-center">
+        <h1>Feedback Customer</h1>
         <div class="container">
             <div class="row mt-5">
-                <div class="col-md-6" v-for="item in feedback_customer" :key='item.id'>
-                    <div class="d-flex">
-                        <img :src="'/img/' + item.photo" class="rounded-circle customer-photo">
-                        <div class="p-3">
-                            <h1>{{ item.name}}</h1>
-                            <p>{{ item.feedback_desc}}</p>
-                            <img src="https://lh3.googleusercontent.com/proxy/0i5X0rRIfYFRXJtjtmN17_4ENudQyiTuvGa6Fs3BMJIA6rEO5vyFv2XKhMRqNain3OdaIsmnx8mbvttQlvuI7kq9j4ofEmAGlk_IiHmwzaueEADuitySQTgUOpqskGess6kUN4lVC_LdQRt8" style="height:50px">
-                        </div>
+                <div class="col-md-6 col-sm-12" v-for="item in feedback_customer" :key='item.id'>
+                    <img :src="'/img/' + item.profile_picture" class="rounded-circle customer-photo">
+                    <div class="p-3">
+                        <h1>{{ item.name}}</h1>
+                        <p>{{ item.feedback_desc}}</p>
+                        <img src="https://img.pngio.com/evaluation-five-star-rating-favorite-like-recommend-icon-of-star-rating-png-256_256.png" style="height:100px">
                     </div>
                 </div>
             </div>

@@ -31,20 +31,25 @@ $routes->setAutoRoute(true);
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->get('/', 'Home::index');
+// $routes->get('/', 'Home::index');
+$routes->get('/', 'ProductController::index');
 // product view
 $routes->group('/product', function ($routes) {
-	$routes->get('/', 'ProductController::index');
 	$routes->get('all', 'ProductController::getAllProduct');
 	$routes->get('detail/(:any)', 'ProductController::productDetail/$1');
 });
+
+
+// Auth
+$routes->post('/auth/register', 'UserController::register');
+
 // product JSON
 $routes->get('/product-json', 'ProductController::productJSON');
 $routes->get('/product-all-json', 'ProductController::getAllProductJSON');
 $routes->get('/product-detail-json/(:any)', 'ProductController::productDetailJSON/$1');
 
 // customer
-$routes->get('/customer/login', 'CustomerController::login');
+$routes->get('/login', 'CustomerController::login');
 $routes->get('/customer/feedback-json', 'CustomerController::feedbackJSON');
 $routes->get('/customer/customer-json', 'CustomerController::customerJSON');
 /*
