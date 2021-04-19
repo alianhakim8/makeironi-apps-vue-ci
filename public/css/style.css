@@ -201,6 +201,16 @@ body {
 }
 
 
+.login-register-btn{
+    text-decoration: none;
+    color:#393E41;
+    font-weight: bold;
+}
+
+.login-register-btn:hover{
+    color: #E7BB41;
+}
+
 /* responsive top nav on mobile view */
 
 @media only screen and (max-width: 767px) {
@@ -239,7 +249,11 @@ body {
     .detail-mobile {
         display: block;
     }
+    .footer-mobile{
+        text-align: center;
+    }
 }
+
 
 .gender {
     margin-left: 30px;
