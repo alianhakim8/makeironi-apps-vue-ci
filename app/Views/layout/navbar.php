@@ -126,25 +126,36 @@
         </modal>
 
         <modal v-if="showModalRegister" @close="showModalRegister = false">
-
             <div slot="body">
                 <button class="modal-default-button" @click='hide'>X</button>
 
                 <h3 class="mb-3">Register</h3>
                 <hr>
-                <input type=" text" placeholder="Name" class="form-control mt-3 mb-3">
-                <input type=" text" placeholder="Email" class="form-control">
-                <input type="password" placeholder="Password" class="form-control mt-3 mb-3">
-                <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3">
-                <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3">
-                <input type="date" placeholder="Tanggal Lahir" class="form-control mt-3 mb-3">
-                <button class="btn btn-warning w-100">Register</button>
+                <input type=" email" placeholder="Email" class="form-control" v-model='formLogin.email'>
+                <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='formLogin.password'>
+                <input type=" text" placeholder="Name" class="form-control mt-3 mb-3" v-model='formLogin.name'>
+                <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3" v-model='formLogin.address'>
+                <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3" v-model='formLogin.phone_number'>
+                <input type="date" placeholder="Tanggal Lahir" class="form-control mt-3 mb-3" v-model='formLogin.tanggal_lahir'>
+
+                <p>Jenis Kelamin : </p>
+                <div class="d-flex p-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gender" id="" v-bind:value="'p'" checked>
+                        <label class="form-check-label" for="radiobutton1"> Pria </label>
+                    </div>
+                    <div class="form-check gender">
+                        <input class="form-check-input ml-2" type="radio" name="gender" id="radiobutton2" v-bind:value="'w'">
+                        <label class="form-check-label" for="exampleRadios2"> Wanita </label>
+                    </div>
+                </div>
+
+                <button class="btn btn-warning w-100 mt-2 mb-2" @click='register'>Register</button>
                 <div class="text-center">
-                    <p>Or</p>
+                    <p class="mt-2">Or</p>
                     <button class="btn btn-light"><i class="fa fa-google"></i> Sign in with Google</button>
                 </div>
             </div>
-
         </modal>
 </div>
 </nav>
@@ -166,13 +177,17 @@
             showModal: false,
             showModalRegister: false,
             formLogin: {
-                name: null,
-                email: null,
-                password: null,
-                alamat: null,
-                noHP: null,
-                tanggalLahir: null
-            }
+                name: '',
+                email: '',
+                password: '',
+                alamat: '',
+                phone_number: '',
+                tanggal_lahir: '',
+                gender: 'Pria',
+            },
+        },
+        created() {
+            axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
         },
         methods: {
             hideLogin() {
@@ -186,10 +201,31 @@
                 this.formLogin.password = ''
             },
             login() {
-                alert(this.formLogin.email);
+                axios.post('auth/login', {
+                    email: this.formLogin.email,
+                    password: this.formLogin.password
+                }).then(function(response) {
+                    if (response.data.message) {
+                        alert('Loading')
+                        setTimeout(() => {
+                            console.log('success')
+                        }, 500);
+                    }
+                });
             },
-            register() {
-
+            register: function() {
+                axios.post('/auth/register', {
+                    name: this.formLogin.name,
+                    email: this.formLogin.email,
+                    password: this.formLogin.password,
+                    alamat: this.formLogin.alamat,
+                    no_hp: this.formLogin.phone_number,
+                    tanggal_lahir: this.formLogin.tanggal_lahir,
+                    gender: this.formLogin.gender
+                }).then(function(response) {
+                    // alert
+                    showModalRegister = false
+                });
             }
         }
     });

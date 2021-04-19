@@ -204,9 +204,9 @@ body {
 /* responsive top nav on mobile view */
 
 @media only screen and (max-width: 767px) {
-    body {
+    /* body {
         font-size: 3.5vw;
-    }
+    } */
     .top-nav #phone-number,
     #email {
         display: none;
@@ -227,8 +227,11 @@ body {
     .cart-desktop {
         visibility: collapse;
     }
-    .row>* {
+    .row-mobile>* {
         width: 50%!important;
+    }
+    .btn-mobile {
+        margin-top: 5px;
     }
     .detail-desktop {
         display: none;
@@ -236,4 +239,8 @@ body {
     .detail-mobile {
         display: block;
     }
+}
+
+.gender {
+    margin-left: 30px;
 }

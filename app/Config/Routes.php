@@ -2,6 +2,9 @@
 
 namespace Config;
 
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -42,6 +45,7 @@ $routes->group('/product', function ($routes) {
 
 // Auth
 $routes->post('/auth/register', 'UserController::register');
+$routes->post('/auth/login', 'UserController::login');
 
 // product JSON
 $routes->get('/product-json', 'ProductController::productJSON');

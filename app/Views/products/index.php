@@ -25,7 +25,7 @@
             <h3 class="h3"><span>New Variant</span></h3>
         </div>
 
-        <div class="row mt-5">
+        <div class="row mt-5 row-mobile">
             <div class="col-md-3 col-xs-4" v-for="product in filterProduct" :key='product.id'>
                 <div class="card mt-2">
                     <div class="card-body">
@@ -42,7 +42,7 @@
                                 <a :href="'product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
                             </div>
                             <div class="col-md-4">
-                                <a :href="'product/detail/' + product.id" class="btn btn-yellow w-100">Beli</a>
+                                <a :href="'product/detail/' + product.id" class="btn btn-warning btn-mobile w-100">Beli</a>
                             </div>
                         </div>
                     </div>
@@ -54,8 +54,8 @@
             <h3 class="h3"><span>Originals</span></h3>
         </div>
 
-        <div class="row mt-5">
-            <div class="col-md-3" v-for="product in filterProduct" :key='product.id'>
+        <div class="row mt-5 row-mobile">
+            <div class="col-md-3 col-sm12" v-for="product in filterProduct" :key='product.id'>
                 <div class="card mt-2">
                     <div class="card-body">
                         <img v-bind:src="'/img/product/'+ product.images" class="img-fluid">
@@ -68,16 +68,17 @@
 
                         <div class="row">
                             <div class="col-md-8">
-                                <a :href="'/product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
+                                <a :href="'/product/detail/' + product.id" class="btn btn-outline-dark w-100 ">Detail</a>
                             </div>
                             <div class="col-md-4">
-                                <a :hreft="'/product/detail/' + product.id" class="btn btn-warning w-100">Beli</a>
+                                <a :hreft="'/product/detail/' + product.id" class="btn btn-warning w-100  btn-mobile">Beli</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
     <div class="card p-5 mt-5 bg-dark text-light rounded-0 text-center">
         <h1>Feedback Customer</h1>
