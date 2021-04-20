@@ -44,7 +44,7 @@ class UserController extends BaseController
             $this->model->insert($data);
             return $this->respond([
                 'code' => 201,
-                'message'    => 'Data Berhasil Disimpan!',
+                'message'    => 'Registrasi Berhasil',
             ], 201);
         }
     }
@@ -54,18 +54,31 @@ class UserController extends BaseController
         if ($this->request) {
             if ($this->request->getJSON()) {
                 $json = $this->request->getJSON();
+                // $session = session();
                 $email = $json->email;
                 $password = $json->password;
                 $user = $this->model->where('email', $email)->first();
                 if (password_verify($password, $user['password'])) {
                     return $this->respond([
                         'code' => 201,
-                        'message' => 'login berhasil',
+                        'message' => 'Login berhasil',
+                        'id' => $user['id_customer'],
+                        'email' => $user['email'],
+                        'name' => $user['name'],
+                        'logged_in' => TRUE
                     ], 201);
+                    // $user_logged_in = [
+                    //     'id' => $user['id'],
+                    //     'email' => $user['email'],
+                    //     'name' => $user['name'],
+                    //     'logged_in' => TRUE
+                    // ];
+                    // $session->set($user_logged_in);
+                    // return redirect()->to('/dashboard');
                 } else {
                     return $this->respond([
-                        'code' => 201,
-                        'message' => 'login gagal',
+                        'code' => 400,
+                        'message' => 'Login gagal, cek kembali email & password',
                     ], 400);
                 }
             } else {
@@ -75,15 +88,22 @@ class UserController extends BaseController
                 if (password_verify($password, $user['password'])) {
                     return $this->respond([
                         'code' => 201,
-                        'message'    => 'login berhasil',
+                        'message'    => 'Login berhasil',
                     ], 201);
                 } else {
                     return $this->respond([
-                        'code' => 201,
-                        'message'    => 'login gagal',
+                        'code' => 400,
+                        'message'    => 'Login gagal, cek kembali email & password',
                     ], 400);
                 }
             }
         }
+    }
+
+    public function logout()
+    {
+        $session = session();
+        $session->destroy();
+        return redirect()->to('/');
     }
 }

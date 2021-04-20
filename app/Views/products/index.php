@@ -7,11 +7,6 @@
         <div class="carousel-inner">
             <div class="carousel-item active item">
                 <img class="d-block w-100" src="/img/carousel.jpeg" alt="First slide">
-                <div class="carousel-caption d-none d-md-block text-dark">
-                    <h1>Make (I) Roni</h1>
-                    <p>Cemilan Kriuk Gak Bikin Gemuk</p>
-                    <p>Lokal Lestari</p>
-                </div>
             </div>
         </div>
     </div>

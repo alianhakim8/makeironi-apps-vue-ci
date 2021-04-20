@@ -33,7 +33,7 @@
         },
         "brandSetting": {
             "brandName": "Make I Roni",
-            "brandSubTitle": "Typically replies within a day",
+            "brandSubTitle": "Online",
             "brandImg": "https://cdn3.iconfinder.com/data/icons/tidee-food/24/016_023_pasta_penette_macaroni_food-512.png",
             "welcomeText": "Halo ! \nMau Pesan Makaroni Rasa Apa ?",
             "messageText": "Halo kak ! aku pengen dong makaroni make i roni nya kayaknya keliatan tasty banget nih :D",
@@ -41,7 +41,7 @@
             "ctaText": "Start Chat",
             "borderRadius": "25",
             "autoShow": false,
-            "phoneNumber": "62895380113593"
+            "phoneNumber": "62821-6854-0447"
         }
     };
     s.onload = function() {

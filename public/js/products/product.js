@@ -1,22 +1,6 @@
 var vm = new Vue({
     el: "#app",
     data: {
-        // products: [{
-        //     id: 1,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 2,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 3,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 4,
-        //     product_name: 'Makeroni'
-        // }, {
-        //     id: 5,
-        //     product_name: 'Roy'
-        // }],
         products: [],
         feedback_customer: [],
         keyword: "",
@@ -40,13 +24,13 @@ var vm = new Vue({
         // get from database
         getProducts() {
             axios.get("/product-json").then((response) => {
-                console.log(response.data);
+                // console.log(response.data);
                 this.products = response.data;
             });
         },
         getcustomers() {
             axios.get("/customer/feedback-json").then((response) => {
-                console.log(response.data);
+                // console.log(response.data);
                 this.feedback_customer = response.data;
             });
         },

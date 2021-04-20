@@ -67,9 +67,9 @@
 <div id="appLogin">
     <nav class="navbar navbar-expand-lg navbar-light top-nav">
         <div class="container">
-            <p id="phone-number">+62 851 5645 xxxx</p>
-            <p id="response-text">Fast Response : 08.00 - 21.00 WIB</p>
-            <p id="email">makeironi.web@makeironi.com</p>
+            <p id="phone-number">+62 821-6854-0447</p>
+            <p id="response-text">Fast Response : 08.00 - 12.00 WIB</p>
+            <p id="email">makeironi.web@gmail.com</p>
         </div>
     </nav>
 
@@ -152,12 +152,12 @@
                 <p>Jenis Kelamin : </p>
                 <div class="d-flex p-2">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="gender" id="" v-bind:value="'p'" checked>
-                        <label class="form-check-label" for="radiobutton1"> Pria </label>
+                        <input class="form-check-input" v-model='formLogin.gender' type="radio" name="gender" id="" v-bind:value="'L'" checked>
+                        <label class="form-check-label" for="radiobutton1"> Laki-Laki </label>
                     </div>
                     <div class="form-check gender">
-                        <input class="form-check-input ml-2" type="radio" name="gender" id="radiobutton2" v-bind:value="'w'">
-                        <label class="form-check-label" for="exampleRadios2"> Wanita </label>
+                        <input class="form-check-input ml-2" v-model='formLogin.gender' type="radio" name="gender" id="radiobutton2" v-bind:value="'P'">
+                        <label class="form-check-label" for="exampleRadios2"> Perempuan </label>
                     </div>
                 </div>
 
@@ -172,121 +172,4 @@
 </nav>
 </div>
 
-<script>
-    // register modal component
-    Vue.component("modal", {
-        template: "#modal-template"
-    });
-    Vue.component("modal", {
-        template: "#modal-template-register"
-    });
-
-    // start app
-    var login = new Vue({
-        el: "#appLogin",
-        data: {
-            showModal: false,
-            showModalRegister: false,
-            formLogin: {
-                name: '',
-                email: '',
-                password: '',
-                alamat: '',
-                phone_number: '',
-                tanggal_lahir: '',
-                gender: '',
-            },
-            error: false,
-            errorMessage: ''
-        },
-        created() {
-            axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-        },
-        methods: {
-            hideLogin() {
-                this.showModal = false;
-                this.showModalRegister = true;
-            },
-            hideRegister() {
-                this.showModal = true;
-                this.showModalRegister = false;
-            },
-            hide() {
-                this.showModal = false;
-                this.showModalRegister = false
-                this.formLogin.email = ''
-                this.formLogin.password = ''
-            },
-            login() {
-                if (this.formLogin.email == '' || this.formLogin.password == '') {
-                    this._data.error = true
-                    this._data.errorMessage = 'Harap lengkapi data'
-                } else {
-                    axios.post('/auth/login', {
-                        email: this.formLogin.email,
-                        password: this.formLogin.password
-                    }).then(function(response) {
-                        if (response.data.message) {
-                            // alert('silahkan tunggu')
-                            setTimeout(() => {
-                                alert('login sukses')
-                                this.showModal = false;
-                            }, 100);
-                        }
-                    }).catch(function(error) {
-                        if (error.response) {
-                            // Request made and server responded
-                            console.log(error.response.data);
-                            console.log(error.response.status);
-                            console.log(error.response.headers);
-                            this.login._data.error = true;
-                            this.login._data.errorMessage = 'Gagal login, periksa kembali email & password'
-                        } else if (error.request) {
-                            // The request was made but no response was received
-                            console.log(error.request);
-                        } else {
-                            // Something happened in setting up the request that triggered an Error
-                            console.log('Error', error.message);
-                        }
-                    });
-                }
-            },
-            register: function() {
-                if (this.formLogin.name == '' || this.formLogin.email == '' || this.formLogin.password == '' || this.formLogin.alamat == '' || this.formLogin.phone_number == '' || this.formLogin.tanggal_lahir == '') {
-                    this.error = true;
-                    this.errorMessage = 'Harap lengkapi data'
-                } else {
-                    axios.post('/auth/register', {
-                        name: this.formLogin.name,
-                        email: this.formLogin.email,
-                        password: this.formLogin.password,
-                        alamat: this.formLogin.alamat,
-                        no_hp: this.formLogin.phone_number,
-                        tanggal_lahir: this.formLogin.tanggal_lahir,
-                        gender: this.formLogin.gender
-                    }).then(function(response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil Registrasi',
-                        })
-                        this.login._data.showModalRegister = false;
-                    }).catch(function(error) {
-                        if (error.response) {
-                            // Request made and server responded
-                            console.log(error.response.data);
-                            console.log(error.response.status);
-                            console.log(error.response.headers);
-                            alert('email sudah terdaftar')
-                        } else if (error.request) {
-                            // The request was made but no response was received
-                            console.log(error.request);
-                        } else {
-                            // Something happened in setting up the request that triggered an Error
-                            console.log('Error', error.message);
-                        }
-                    })
-                }
-            }
-        }
-    });
-</script>
+<script src="/js/users/login.js"></script>

@@ -26,7 +26,7 @@ var vm = new Vue({
         getProductDetail() {
             const id = location.pathname.split("/")[3];
             axios.get("/product-detail-json/" + id).then((response) => {
-                console.log(response.data);
+                // console.log(response.data);
                 this.products = response.data;
                 this.stockFromDb = response.data.stock;
             });
