@@ -25,6 +25,7 @@ var login = new Vue({
     logged_in: false,
     error: false,
     errorMessage: "",
+    passwordFieldType: "password",
   },
   mounted() {
     this.logged_in = localStorage.getItem("email");
@@ -157,11 +158,25 @@ var login = new Vue({
       }
     },
     logout: function () {
-      localStorage.removeItem("email");
-      this.reloadPage();
+      Swal.fire({
+        title: "Keluar ?",
+        confirmButtonText: `Ya`,
+        showDenyButton: true,
+        denyButtonText: `Tidak`,
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          localStorage.removeItem("email");
+          this.reloadPage();
+        }
+      });
     },
     reloadPage() {
       window.location.reload();
+    },
+    switchVisibility() {
+      this.passwordFieldType =
+        this.passwordFieldType === "password" ? "text" : "password";
     },
   },
 });

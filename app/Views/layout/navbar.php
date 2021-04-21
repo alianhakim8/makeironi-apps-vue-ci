@@ -92,7 +92,21 @@
                         <a class="nav-link">About</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav ml-auto" v-if='logged_in'>
+                <div class="dropdown" v-if='logged_in'>
+    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">
+     <img src="https://cdn1.iconfinder.com/data/icons/flat-business-icons/128/user-512.png" class='img-fluid profile_image'>
+       <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu p-2 mt-2" role="menu" aria-labelledby="menu1">
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">{{logged_in}}</a></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">Cart 0</a></li>
+      <li role="presentation" class="divider"></li>
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="#" @click='logout' class="nav-link">Keluar</a></li>
+    </ul>
+  </div>
+                <!-- <ul class="navbar-nav ml-auto" v-if='logged_in'>
+                   
+                   
                     <li>
                         <a id="show-modal" @click="showModal = true" class="nav-link login-link"><strong>Halo, {{ logged_in}}</strong></a>
                     </li>
@@ -104,7 +118,7 @@
                     <li>
                         <a  @click="logout" class="nav-link login-link"><strong>Keluar</strong></a>
                     </li>
-                </ul>
+                </ul> -->
 
                 <ul class="navbar-nav ml-auto" v-else>
                     <li>
@@ -133,7 +147,7 @@
                 <h3 class="mb-3">Login</h3>
                 <hr>
                 <input type=" text" placeholder="Email" class="form-control" v-model='formLogin.email'>
-                <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='formLogin.password'>
+                <input :type="passwordFieldType" placeholder="Password" class="form-control mt-3 mb-3" v-model='formLogin.password'>
                 <button class="btn btn-warning w-100" @click='login'>Login</button>
                 <div class="text-center">
                     <p class="mt-3">Atau</p>
