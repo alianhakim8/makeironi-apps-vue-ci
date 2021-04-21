@@ -100,10 +100,18 @@ class UserController extends BaseController
         }
     }
 
-    public function logout()
-    {
-        $session = session();
-        $session->destroy();
-        return redirect()->to('/');
+    public function check_user($email){
+        $user = $this->model->where('email', $email)->first();
+        if($user){
+            return $this->respond([
+                'code' => 200,
+                'logged_in'=> true,
+            ], 200);
+        }else{
+            return $this->respond([
+                'code' => 400,
+                'logged_in'=> false,
+            ], 400);
+        }
     }
 }

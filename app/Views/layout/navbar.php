@@ -92,10 +92,25 @@
                         <a class="nav-link">About</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav ml-auto" v-if='logged_in'>
+                    <li>
+                        <a id="show-modal" @click="showModal = true" class="nav-link login-link"><strong>Halo, {{ logged_in}}</strong></a>
+                    </li>
+                    
+                    <li class="cart-desktop">
+                        <button type="button" class="btn btn-yellow">Cart <span class="badge text-dark">0</span></button>
+                    </li>
+
+                    <li>
+                        <a  @click="logout" class="nav-link login-link"><strong>Keluar</strong></a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ml-auto" v-else>
                     <li>
                         <a id="show-modal" @click="showModal = true" class="nav-link login-link"><strong>Login</strong></a>
                     </li>
+                    
                     <li class="cart-desktop">
                         <button type="button" class="btn btn-yellow">Cart <span class="badge text-dark">0</span></button>
                     </li>
