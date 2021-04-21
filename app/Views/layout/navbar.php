@@ -154,7 +154,7 @@
                     <button class="btn btn-light"><i class="fa fa-google"></i> Masuk dengan Google</button>
                 </div>
                 <div class="text-center mt-3">
-                    <!-- <button class="btn btn-dark w-100 mt-2" id="show-modal-register" @click="hideLogin">Daftar</button> -->
+                <!-- <button class="btn btn-dark w-100 mt-2" id="show-modal-register" @click="hideLogin">Daftar</button> -->
                     <p>Belum punya akun ? <a href="#" @click.prevent='hideLogin' class="login-register-btn">Daftar</a> </p>
                 </div>
             </div>
