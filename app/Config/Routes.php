@@ -57,7 +57,12 @@ $routes->get('/login', 'CustomerController::login');
 $routes->get('/customer/feedback-json', 'CustomerController::feedbackJSON');
 $routes->get('/customer/customer-json', 'CustomerController::customerJSON');
 
-$routes->get('/check_user/(:any)','UserController::check_user/$1');
+$routes->get('/check_user/(:any)', 'UserController::check_user/$1');
+
+
+// cart
+$routes->get('/cartView/', 'ShoppingCartController::cart_view');
+$routes->post('/cart/', 'ShoppingCartController::cart');
 /*
  * --------------------------------------------------------------------
  * Additional Routing

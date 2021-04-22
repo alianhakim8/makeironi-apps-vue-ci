@@ -69,7 +69,7 @@
         <div class="container">
             <p id="phone-number">+62 821-6854-0447</p>
             <p id="response-text">Fast Response : 08.00 - 12.00 WIB</p>
-            <p id="email">makeironi.web@gmail.com</p>
+            <a href='https://mail.google.com/mail/u/?authuser=makeironie@gmail.com' target='_blank' id="email" class="nav-link text-light">makeironie@gmail.com</a>
         </div>
     </nav>
 
@@ -93,40 +93,28 @@
                     </li>
                 </ul>
                 <div class="dropdown" v-if='logged_in'>
-    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">
-     <img src="https://cdn1.iconfinder.com/data/icons/flat-business-icons/128/user-512.png" class='img-fluid profile_image'>
-       <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu p-2 mt-2" role="menu" aria-labelledby="menu1">
-      <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">{{logged_in}}</a></li>
-      <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">Cart 0</a></li>
-      <li role="presentation" class="divider"></li>
-      <li role="presentation"><a role="menuitem" tabindex="-1" href="#" @click='logout' class="nav-link">Keluar</a></li>
-    </ul>
-  </div>
-                <!-- <ul class="navbar-nav ml-auto" v-if='logged_in'>
-                   
-                   
-                    <li>
-                        <a id="show-modal" @click="showModal = true" class="nav-link login-link"><strong>Halo, {{ logged_in}}</strong></a>
-                    </li>
-                    
-                    <li class="cart-desktop">
-                        <button type="button" class="btn btn-yellow">Cart <span class="badge text-dark">0</span></button>
-                    </li>
+                    <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">
+                        <img src="https://cdn1.iconfinder.com/data/icons/flat-business-icons/128/user-512.png" class='img-fluid profile_image'>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu p-2 mt-2" role="menu" aria-labelledby="menu1">
+                        <li class="cart-desktop">
+                            <button type="button" class="btn btn-yellow ml-3 w-100" @click='cart'>Cart <span class="badge text-dark">0</span></button>
+                        </li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">{{logged_in}}</a></li>
+                        <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">Cart 0</a></li> -->
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#" @click='logout' class="nav-link">Keluar</a></li>
+                    </ul>
 
-                    <li>
-                        <a  @click="logout" class="nav-link login-link"><strong>Keluar</strong></a>
-                    </li>
-                </ul> -->
-
+                </div>
                 <ul class="navbar-nav ml-auto" v-else>
                     <li>
                         <a id="show-modal" @click="showModal = true" class="nav-link login-link"><strong>Login</strong></a>
                     </li>
-                    
+
                     <li class="cart-desktop">
-                        <button type="button" class="btn btn-yellow">Cart <span class="badge text-dark">0</span></button>
+                        <button type="button" class="btn btn-yellow" @click='cart'>Cart <span class="badge text-dark">0</span></button>
                     </li>
                 </ul>
             </div>
@@ -154,7 +142,7 @@
                     <button class="btn btn-light"><i class="fa fa-google"></i> Masuk dengan Google</button>
                 </div>
                 <div class="text-center mt-3">
-                <!-- <button class="btn btn-dark w-100 mt-2" id="show-modal-register" @click="hideLogin">Daftar</button> -->
+                    <!-- <button class="btn btn-dark w-100 mt-2" id="show-modal-register" @click="hideLogin">Daftar</button> -->
                     <p>Belum punya akun ? <a href="#" @click.prevent='hideLogin' class="login-register-btn">Daftar</a> </p>
                 </div>
             </div>
@@ -201,4 +189,4 @@
 </nav>
 </div>
 
-<script src="/js/users/login.js"></script>
+<script src="/js/users/user.js"></script>

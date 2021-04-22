@@ -7,7 +7,7 @@ Vue.component("modal", {
 });
 
 // start app
-var login = new Vue({
+let login = new Vue({
   el: "#appLogin",
   data: {
     showModal: false,
@@ -85,11 +85,11 @@ var login = new Vue({
           })
           .then(function (response) {
             if (response.data.message) {
-              this.login._data.showModal = false;
+              login._data.showModal = false;
               localStorage.setItem("id", response.data.id);
               localStorage.setItem("email", response.data.email);
               localStorage.setItem("name", response.data.name);
-              this.login.reloadPage();
+              login.reloadPage();
             }
           })
           .catch(function (error) {
@@ -167,6 +167,8 @@ var login = new Vue({
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
           localStorage.removeItem("email");
+          localStorage.removeItem("id");
+          localStorage.removeItem("name");
           this.reloadPage();
         }
       });
@@ -177,6 +179,13 @@ var login = new Vue({
     switchVisibility() {
       this.passwordFieldType =
         this.passwordFieldType === "password" ? "text" : "password";
+    },
+    cart() {
+      if (this.logged_in) {
+        alert("sudah login");
+      } else {
+        this.showModal = true;
+      }
     },
   },
 });

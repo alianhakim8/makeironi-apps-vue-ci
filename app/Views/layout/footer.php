@@ -2,13 +2,13 @@
     <div class="card footer-1 rounded-0 footer-mobile">
         <div class="container">
             <h1>Hubungi Kami Melalui</h1>
-            <p>+62 851 5645 xxxx </p>
-            <p>makeironi.web@makeroni.com</p>
+            <p>+62 821-6854-0447</p>
+            <p>makeironie@gmail.com</p>
         </div>
     </div>
 
     <div class="card bg-dark rounded-0 copyright">
-        <div class="container text-light pt-2">
+        <div class="container text-light pt-3">
             <p class="footer-mobile">Copyright MakeIroni 2021. All Right Reserved.</p>
         </div>
     </div>

@@ -1,6 +1,9 @@
 <?= $this->extend('layout/template'); ?>
 <?= $this->section('content'); ?>
 <div id="product-detail">
+    <div class="alert alert-warning" role="alert" v-if='warning'>
+        Minimal pembelian 1
+    </div>
     <div class="container">
         <div class="card mb-5 mt-5 detail-desktop w-100" style="max-width: 540px;">
             <div class="row no-gutters">
@@ -18,7 +21,7 @@
                                 <p id="badge-text" class="stock">{{ stock }}</p>
                             </span></button>
                             <button class="btn btn-dark" @click='increase'>+</button>
-                            <button class="btn btn-success btn-cart">+ Keranjang</button>
+                            <button class="btn btn-success btn-cart" @click="addToCart">+ Keranjang</button>
                         </div>
                     </div>
                 </div>
@@ -67,7 +70,7 @@
                                     <a :href="'/product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
                                 </div>
                                 <div class="col-md-4">
-                                    <button class="btn btn-warning w-100" @onClick='stock'>Beli</button>
+                                    <button class="btn btn-warning w-100">Beli</button>
                                 </div>
                             </div>
                         </div>
