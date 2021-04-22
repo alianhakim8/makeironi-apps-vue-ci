@@ -61,8 +61,9 @@ $routes->get('/check_user/(:any)', 'UserController::check_user/$1');
 
 
 // cart
-$routes->get('/cartView/', 'ShoppingCartController::cart_view');
-$routes->post('/cart/', 'ShoppingCartController::cart');
+$routes->get('/cartView', 'ShoppingCartController::cart_view');
+$routes->post('/cart', 'ShoppingCartController::cart');
+$routes->get('/cart-detail-json', 'ShoppingCartController::get_cartJSON');
 /*
  * --------------------------------------------------------------------
  * Additional Routing

@@ -43,6 +43,10 @@ class ShoppingCartController extends BaseController
         }
     }
 
+    public function get_cart()
+    {
+    }
+
     public function get_cartJSON()
     {
         $cart = $this->model->findAll();
