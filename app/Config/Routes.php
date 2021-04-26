@@ -66,6 +66,8 @@ $routes->post('/cart', 'ShoppingCartController::cart');
 $routes->get('/cart-detail-json/(:any)', 'ShoppingCartController::get_cartJSON/$1');
 $routes->delete('/remove-cart/(:any)', 'ShoppingCartController::remove_cart/$1');
 $routes->get('/cart-count/(:any)', 'ShoppingCartController::cart_count/$1');
+$routes->put('/cart-quantity-update/(:any)', 'ShoppingCartController::update_cart_quantity/$1');
+$routes->get('/cart-sum/(:any)', 'ShoppingCartController::total_sum/$1');
 /*
  * --------------------------------------------------------------------
  * Additional Routing

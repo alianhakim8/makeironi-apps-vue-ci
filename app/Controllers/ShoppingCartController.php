@@ -36,9 +36,8 @@ class ShoppingCartController extends BaseController
             }
 
             // $valid = $this->model->product_cart_validation($json->id_product, $json->id_customer);
-            // $new_quantity = $valid[0]['quantity']  + $json->quantity;
 
-            // var_dump(count($valid));
+            // var_dump($valid);
             // die;
 
             // if (count($valid) > 0) {
@@ -57,8 +56,20 @@ class ShoppingCartController extends BaseController
         }
     }
 
-    public function get_cart()
+    public function update_cart_quantity($id_cart)
     {
+        if ($this->request->getJSON()) {
+            $json = $this->request->getJSON();
+            $data = [
+                'price' => $json->price,
+
+                'quantity' => $json->quantity,
+            ];
+            $this->model->update($id_cart, $data);
+        }
+        return json_encode([
+            'message' => 'success'
+        ]);
     }
 
     public function get_cartJSON($id_customer)
@@ -86,5 +97,11 @@ class ShoppingCartController extends BaseController
         $result = $this->model->cart_count($id_cart);
 
         return json_encode($result);
+    }
+
+    public function total_sum($id_customer)
+    {
+        $cart = $this->model->sum_total($id_customer);
+        return json_encode($cart);
     }
 }

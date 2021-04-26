@@ -36,7 +36,7 @@
                 <p class="card-text">Stock : {{ products.stock }}</p>
                 <div class="text-center">
                     <div class="quantity">
-                        <button class="btn btn-dark" @click='decrease'>-</button>
+                        <button class="btn btn-dark" v-on:click='decrease'>-</button>
                         <span class="badge badge-light">
                             <p id="badge-text">{{stock}}</p>
                         </span></button>

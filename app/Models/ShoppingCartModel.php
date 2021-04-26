@@ -4,8 +4,6 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-
-
 class ShoppingCartModel extends Model
 {
     protected $table = 'shopping_cart';
@@ -30,6 +28,7 @@ class ShoppingCartModel extends Model
     public function getShopping($id_customer)
     {
         return $this->db->table('shopping_cart')
+            ->select(['*', 'shopping_cart.price as sub_total'])
             ->join('products', 'products.id=shopping_cart.id_product')
             ->where('id_customer', $id_customer)
             ->get()->getResultArray();
@@ -49,11 +48,11 @@ class ShoppingCartModel extends Model
             ->get()->getResultArray();
     }
 
-    // public function update_cart_quantity($id_product, $id_customer)
-    // {
-    //     return $this->db->table('shopping_cart')
-    //         ->where('id_customer', $id_customer)
-    //         ->where('id_product', $id_product)
-    //         ->get()->getResultArray();
-    // }
+    public function sum_total($id_customer)
+    {
+        return $this->db->table('shopping_cart')
+            ->selectSum('price')
+            ->where('id_customer', $id_customer)
+            ->get()->getResultArray();
+    }
 }

@@ -114,7 +114,7 @@
                     </li>
 
                     <li class="cart-desktop">
-                        <button type="button" class="btn btn-yellow" @click='cart'>Cart <span class="badge text-dark">0</span></button>
+                        <button type="button" class="btn btn-yellow" v-on:click='carts'>Cart <span class="badge text-dark">0</span></button>
                     </li>
                 </ul>
             </div>
