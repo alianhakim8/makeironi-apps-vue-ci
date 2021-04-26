@@ -69,7 +69,7 @@
         <div class="container">
             <p id="phone-number">+62 821-6854-0447</p>
             <p id="response-text">Fast Response : 08.00 - 12.00 WIB</p>
-            <a href='https://mail.google.com/mail/u/?authuser=makeironie@gmail.com' target='_blank' id="email" class="nav-link text-light">makeironie@gmail.com</a>
+            <a href='mailto:makeironi@gmail.com' target='_blank' id="email" class="nav-link text-light">makeironie@gmail.com</a>
         </div>
     </nav>
 
@@ -99,7 +99,7 @@
                     </button>
                     <ul class="dropdown-menu p-2 mt-2" role="menu" aria-labelledby="menu1">
                         <li class="cart-desktop">
-                            <button type="button" class="btn btn-yellow ml-3 w-100" @click='cart'>Cart <span class="badge text-dark">0</span></button>
+                            <a href='/cart-view' class="btn btn-yellow ml-3 w-100">Cart <span class="badge text-dark">{{carts}}</span></a href='/cart-view'>
                         </li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">{{logged_in}}</a></li>
                         <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">Cart 0</a></li> -->
@@ -169,11 +169,11 @@
                 <p>Jenis Kelamin : </p>
                 <div class="d-flex p-2">
                     <div class="form-check">
-                        <input class="form-check-input" v-model='formLogin.gender' type="radio" name="gender" id="" v-bind:value="'L'" checked>
+                        <input class="form-check-input" v-model='formLogin.gender' type="radio" name="gender" id="rbMale" v-bind:value="'L'" checked>
                         <label class="form-check-label" for="radiobutton1"> Laki-Laki </label>
                     </div>
                     <div class="form-check gender">
-                        <input class="form-check-input ml-2" v-model='formLogin.gender' type="radio" name="gender" id="radiobutton2" v-bind:value="'P'">
+                        <input class="form-check-input ml-2" v-model='formLogin.gender' type="radio" name="gender" id="rbFemail" v-bind:value="'P'">
                         <label class="form-check-label" for="exampleRadios2"> Perempuan </label>
                     </div>
                 </div>

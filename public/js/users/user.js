@@ -26,6 +26,7 @@ let login = new Vue({
     error: false,
     errorMessage: "",
     passwordFieldType: "password",
+    carts: 0,
   },
   mounted() {
     this.logged_in = localStorage.getItem("email");
@@ -50,6 +51,7 @@ let login = new Vue({
           console.log("Error", error.message);
         }
       });
+    this.cart_count();
   },
   created() {
     axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
@@ -98,8 +100,8 @@ let login = new Vue({
               //   console.log(error.response.data);
               //   console.log(error.response.status);
               //   console.log(error.response.headers);
-              this.login._data.error = true;
-              this.login._data.errorMessage = error.response.data.message;
+              login._data.error = true;
+              login._data.errorMessage = error.response.data.message;
             } else if (error.request) {
               // The request was made but no response was received
               console.log(error.request);
@@ -138,15 +140,16 @@ let login = new Vue({
               icon: "success",
               title: response.data.message,
             });
-            this.login._data.showModalRegister = false;
+            login._data.showModalRegister = false;
+            login._data.showModal = true;
           })
           .catch(function (error) {
             if (error.response) {
               // // Request made and server responded
-              // console.log(error.response.data);
-              // console.log(error.response.status);
-              // console.log(error.response.headers);
-              alert("Email sudah terdaftar");
+              console.log(error.response.data);
+              console.log(error.response.status);
+              console.log(error.response.headers);
+              // alert("Email sudah terdaftar");
             } else if (error.request) {
               // The request was made but no response was received
               console.log(error.request);
@@ -170,6 +173,7 @@ let login = new Vue({
           localStorage.removeItem("id");
           localStorage.removeItem("name");
           this.reloadPage();
+          window.location.href = "/";
         }
       });
     },
@@ -180,12 +184,11 @@ let login = new Vue({
       this.passwordFieldType =
         this.passwordFieldType === "password" ? "text" : "password";
     },
-    cart() {
-      if (this.logged_in) {
-        alert("sudah login");
-      } else {
-        this.showModal = true;
-      }
+    cart_count() {
+      const id_customer = localStorage.getItem("id");
+      axios.get("/cart-count/" + id_customer).then((response) => {
+        this.carts = response.data;
+      });
     },
   },
 });

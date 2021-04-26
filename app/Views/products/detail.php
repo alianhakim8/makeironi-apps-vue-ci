@@ -70,7 +70,7 @@
                                     <a :href="'/product/detail/' + product.id" class="btn btn-outline-dark w-100">Detail</a>
                                 </div>
                                 <div class="col-md-4">
-                                    <button class="btn btn-warning w-100">Beli</button>
+                                    <a :href="'/product/detail/' + product.id" class="btn btn-warning w-100">Beli</a>
                                 </div>
                             </div>
                         </div>

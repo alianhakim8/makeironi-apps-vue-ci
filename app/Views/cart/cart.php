@@ -12,6 +12,8 @@
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
+                            <th></th>
+                            <th></th>
                             <th scope="col">PRODUCT</th>
                             <th scope="col">PRICE</th>
                             <th scope="col">QUANTITY</th>
@@ -20,15 +22,17 @@
                     </thead>
                     <tbody>
                         <tr v-for='content in carts'>
-                            <th scope="row">{{ content.id_cart }}</th>
+                            <td><button @click='remove_cart(content.id_cart)' class="btn btn-outline-danger align-middle">X</button></td>
+                            <td><img :src="'/img/product/'+content.images" alt="" width="100"></td>
+                            <th scope="row">{{ content.product_name }}</th>
                             <td>{{ content.price}}</td>
-                            <td>{{ content.quantity}}</td>
-                            <td>{{ content.price}}</td>
+                            <td class="text-center">{{ content.quantity}}</td>
+                            <td class="text-center">{{ content.price}}</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <a href="#" class="btn btn-outline-dark">
+                <a href="/" class="btn btn-outline-dark">
                     < Lanjut Belanja</a>
             </div>
 

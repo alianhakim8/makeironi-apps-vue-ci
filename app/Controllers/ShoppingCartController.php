@@ -34,7 +34,21 @@ class ShoppingCartController extends BaseController
                     'price' => $this->request->getPost('price'),
                 ];
             }
+
+            // $valid = $this->model->product_cart_validation($json->id_product, $json->id_customer);
+            // $new_quantity = $valid[0]['quantity']  + $json->quantity;
+
+            // var_dump(count($valid));
+            // die;
+
+            // if (count($valid) > 0) {
+            // $update_rows = array('quantity' => $new_quantity);
+            // $this->model->where('id_customer', $json->id_customer);
+            // $this->model->where('id_product', $json->id_product);
+            // $this->model->update($update_rows);
+            // } else {
             $this->model->insert($data);
+            // }
             // return $this->respond([
             //     'code' => 201,
             //     'message' => 'Add to cart successfully'
@@ -47,14 +61,30 @@ class ShoppingCartController extends BaseController
     {
     }
 
-    public function get_cartJSON()
+    public function get_cartJSON($id_customer)
     {
-        $cart = $this->model->findAll();
+        $cart = $this->model->getShopping($id_customer);
+        // dd($cart);
         return json_encode($cart);
     }
 
     public function cart_view()
     {
         return view('cart/cart');
+    }
+
+    public function remove_cart($id_cart)
+    {
+        $this->model->where('id_cart', $id_cart)->delete();
+        return json_encode([
+            'message' => 'success deleted'
+        ]);
+    }
+
+    public function cart_count($id_cart)
+    {
+        $result = $this->model->cart_count($id_cart);
+
+        return json_encode($result);
     }
 }
