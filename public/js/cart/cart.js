@@ -5,6 +5,7 @@ let cart_vue = new Vue({
         carts: [],
         stock_from_db: 0,
         total: 0,
+        jumlah_produk:0
     },
     mounted() {
         this.total_sum();
@@ -15,22 +16,22 @@ let cart_vue = new Vue({
             axios
                 .delete("/remove-cart/" + id_cart)
                 .then((response) => {
-                    console.log(response);
+                    console.info(response);
                     this.cart();
                 })
                 .catch(function(error) {
                     if (error.response) {
                         // Request made and server responded
-                        console.log(error.response.data);
-                        console.log(error.response.status);
-                        console.log(error.response.headers);
+                        console.info(error.response.data);
+                        console.info(error.response.status);
+                        console.info(error.response.headers);
                         this.carts = response.data;
                     } else if (error.request) {
                         // The request was made but no response was received
-                        console.log(error.request);
+                        console.info(error.request);
                     } else {
                         // Something happened in setting up the request that triggered an Error
-                        console.log("Error", error.message);
+                        console.info("Error", error.message);
                     }
                 });
         },
@@ -40,30 +41,30 @@ let cart_vue = new Vue({
                 .get("/cart-detail-json/" + customer_id)
                 .then((response) => {
                     this.carts = response.data;
-                    console.log(response.data.sub_total);
+                    console.info(response.data.sub_total);
+                    this.jumlah_produk = response.data.length;
                 })
                 .catch(function(error) {
                     if (error.response) {
                         // Request made and server responded
-                        console.log(error.response.data);
-                        console.log(error.response.status);
-                        console.log(error.response.headers);
+                        console.info(error.response.data);
+                        console.info(error.response.status);
+                        console.info(error.response.headers);
                         this.carts = response.data;
                     } else if (error.request) {
                         // The request was made but no response was received
-                        console.log(error.request);
+                        console.info(error.request);
                     } else {
                         // Something happened in setting up the request that triggered an Error
-                        console.log("Error", error.message);
+                        console.info("Error", error.message);
                     }
                 });
         },
         increase(content) {
             this.stock_from_db = content.stock;
-
             if (content.quantity < this.stock_from_db) {
                 content.quantity++;
-                // console.log(this.stock_from_db);
+                // console.info(this.stock_from_db);
                 content.sub_total = content.price * content.quantity;
                 axios
                     .put("cart-quantity-update/" + content.id_cart, {
@@ -71,7 +72,7 @@ let cart_vue = new Vue({
                         quantity: content.quantity,
                     })
                     .then((response) => {
-                        console.log(response);
+                        console.info(response);
                         this.cart();
                         this.total_sum();
                     });
@@ -87,7 +88,7 @@ let cart_vue = new Vue({
                         quantity: content.quantity,
                     })
                     .then((response) => {
-                        console.log(response);
+                        console.info(response);
                         this.cart();
                         this.total_sum();
                     });
@@ -99,5 +100,19 @@ let cart_vue = new Vue({
                 this._data.total = response.data[0].price;
             });
         },
+        addShoping(){
+            axios.post('/purchase',{
+                invoice_number : "245",
+                id_customer : localStorage.getItem('id'),
+                total : this.total
+            }).then(function(response){
+                if(response.data.message){
+                    window.location.href = '/purchase-view'
+                }
+            }).catch(function(error){
+                alert('error');
+                window.location.href = '/purchase-view'
+            })
+        }
     },
 });

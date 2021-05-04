@@ -24,5 +24,13 @@ class CustomerController extends Controller
     {
         $model = $this->model->getCustomer();
         return json_encode($model);
+    }  
+
+    public function contact(){
+        return view('contact');
+    }
+
+    public function about(){
+        return view('about');
     }
 }

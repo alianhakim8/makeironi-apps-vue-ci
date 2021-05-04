@@ -68,6 +68,12 @@ $routes->delete('/remove-cart/(:any)', 'ShoppingCartController::remove_cart/$1')
 $routes->get('/cart-count/(:any)', 'ShoppingCartController::cart_count/$1');
 $routes->put('/cart-quantity-update/(:any)', 'ShoppingCartController::update_cart_quantity/$1');
 $routes->get('/cart-sum/(:any)', 'ShoppingCartController::total_sum/$1');
+
+$routes->post('/purchase', 'PurchaseController::purchase');
+$routes->get('/purchase-view', 'PurchaseController::purchaseView');
+
+$routes->get('/contact', 'CustomerController::contact');
+$routes->get('/about', 'CustomerController::about');
 /*
  * --------------------------------------------------------------------
  * Additional Routing
