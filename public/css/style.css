@@ -29,6 +29,20 @@ body {
   background-color: #d3d0cb;
 }
 
+.bg-gray{
+  background-color: lightgray;
+  border: none;
+  border-radius: 0px;
+}
+
+#logo{
+  width: 200px;
+  height: 200px;
+  margin: auto;
+  border-radius: 100%;
+  background-color: black;
+}
+
 .btn-yellow,
 .bg-yellow {
   background-color: #e7bb41 !important;
@@ -70,11 +84,19 @@ body {
   padding: 0 10px;
 }
 
+
+.quantity-cart {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
 .quantity {
   display: flex;
   flex-direction: row;
 }
 
+.quantity-cart .badge ,
 .quantity .badge {
   color: #000;
   border: 1px solid black;
@@ -84,7 +106,7 @@ body {
   display: flex;
 }
 
-.quantity .badge #badge-text {
+.quantity-cart .badge #badge-text,.quantity .badge #badge-text {
   margin: auto;
 }
 
