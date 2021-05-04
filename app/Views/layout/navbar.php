@@ -120,7 +120,7 @@
             </div>
             <ul class="navbar-nav ml-auto cart-mobile">
                 <li>
-                    <button type="button" class="btn btn-yellow"><span class="badge badge-dark">0</span></button>
+                    <a href='/cart-view' class="btn btn-yellow ml-3 w-100">Cart <span class="badge text-dark">{{carts}}</span></a href='/cart-view'>
                 </li>
             </ul>
         </div>

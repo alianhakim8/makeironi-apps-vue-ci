@@ -42,7 +42,7 @@
                         </span></button>
                         <button class="btn btn-dark" v-on:click='increase'>+</button>
                     </div>
-                    <button class="btn btn-success m-auto">Add To Cart</button>
+                    <button class="btn btn-success m-auto" @click="addToCart">Add To Cart</button>
                 </div>
             </div>
         </div>
