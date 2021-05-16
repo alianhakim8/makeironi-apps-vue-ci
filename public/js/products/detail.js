@@ -7,6 +7,7 @@ var vm = new Vue({
         stock: 0,
         stockFromDb: 0,
         warning: false,
+        product_name: ''
     },
     computed: {
         filterProduct() {
@@ -18,15 +19,15 @@ var vm = new Vue({
             });
         },
     },
-    created: function() {
+    created: function () {
         axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
         this.getProductDetail();
     },
     methods: {
         // get from database
         getProductDetail() {
-            const id = location.pathname.split("/")[3];
-            axios.get("/product-detail-json/" + id).then((response) => {
+            const id = location.pathname.split("/")[4];
+            axios.get(`/api/user/product/detail-json/${id}`).then((response) => {
                 // console.log(response.data);
                 this.products = response.data;
                 this.stockFromDb = response.data.stock;
@@ -52,27 +53,34 @@ var vm = new Vue({
             let id_product = this.products.id;
             let price = this.products.price;
             let quantity = this.stock;
+            vm.product_name = this.products.product_name;
             if (id_customer) {
                 if (quantity == 0) {
                     this.warning = true;
                 } else {
                     this.warning = false;
                     axios
-                        .post("/cart/", {
+                        .post("/user/cart/", {
                             id_customer,
                             id_product,
                             price,
                             quantity,
                         })
-                        .then(function(response) {
-                            // handle success response
-                            Swal.fire("Berhasil di tambahkan ke cart", "success");
+                        .then(function (response) {
+
+                            // console.info(response)
+                            // // handle success response
+                            Swal.fire(
+                                '',
+                                `${vm.product_name} Berhasil di tambahkan ke cart`,
+                                'success'
+                            )
                             setTimeout(() => {
                                 window.location.reload();
                             }, 1000);
-                            console.log(response);
+                            console.log(vm.product_name);
                         })
-                        .catch(function(error) {
+                        .catch(function (error) {
                             if (error.response) {
                                 // // Request made and server responded
                                 console.log(error.response.data);
@@ -80,8 +88,10 @@ var vm = new Vue({
                                 console.log(error.response.headers);
                                 Swal.fire({
                                     icon: "warning",
-                                    title: "Produk sudah ada di cart",
+                                    title: `${vm.product_name} sudah ada di cart`,
                                 });
+                                console.log();
+
                             } else if (error.request) {
                                 // The request was made but no response was received
                                 console.log(error.request);
@@ -93,7 +103,10 @@ var vm = new Vue({
                 }
             } else {
                 alert("Anda belum login, login terlebih dahulu");
-                login._data.showModal = true;
+                $('.loginModal').modal('show');
+                $('.close').click(function () {
+                    $('.loginModal').modal('hide');
+                });
             }
         },
     },

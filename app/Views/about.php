@@ -2,10 +2,13 @@
 <?= $this->section('content'); ?>
 <div class="container text-center">
     <br>
-    <div id="logo"></div>
-    <h1 class="mt-5 mb-5">About Us</h1>
+    <h1 class="mt-5">Tentang Kami</h1>
     <hr>
-    <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptate nihil perferendis dolor quibusdam nostrum! Similique consequatur cupiditate ipsum sunt delectus rerum, perspiciatis alias, eveniet omnis odit debitis nostrum dolor vel.</p>
+    <img src="/img/logo_black.png" width="200">
+    <p class="text-center mb-5">MakeIroni adalah sebuah brand dari produk Macaroni, yang berasal dari Kota Cimahi.
+        Make(I)Roni sendiri berasal dari kata "Macaroni" yang dirubah menjadi Make(I)Roni yang artinya sendiri "Make Ironi" atau "Membuat Ironi".Ironi biasanya menandakan perbedaan antara penampakan atau pengetahuan kita akan sesuatu dan realitanya.
+        Jadi bisa diambil kesimpulan bahwa arti dari MakeIroni adalah ketika seseorang menikmati produk makeironi akan merasakan rasa tidak yakin (ironi) yang disebabkan oleh perbedaan harga murah namun memiliki rasa yang nikmat.
+    </p>
 </div>
 
 <?= $this->endSection(); ?>

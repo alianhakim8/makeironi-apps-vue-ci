@@ -1,0 +1,46 @@
+{
+    "title": "CodeIgniter\\Exceptions\\PageNotFoundException",
+    "type": "CodeIgniter\\Exceptions\\PageNotFoundException",
+    "code": 404,
+    "message": "Controller or its method is not found: \\App\\Controllers\\Js::user.js",
+    "file": "C:\\xampp\\htdocs\\makeironi-apps-vue-ci\\vendor\\codeigniter4\\framework\\system\\CodeIgniter.php",
+    "line": 1003,
+    "trace": [
+        {
+            "file": "C:\\xampp\\htdocs\\makeironi-apps-vue-ci\\vendor\\codeigniter4\\framework\\system\\CodeIgniter.php",
+            "line": 1003,
+            "function": "forPageNotFound",
+            "class": "CodeIgniter\\Exceptions\\PageNotFoundException",
+            "type": "::",
+            "args": [
+                "Controller or its method is not found: \\App\\Controllers\\Js::user.js"
+            ]
+        },
+        {
+            "file": "C:\\xampp\\htdocs\\makeironi-apps-vue-ci\\vendor\\codeigniter4\\framework\\system\\CodeIgniter.php",
+            "line": 349,
+            "function": "display404errors",
+            "class": "CodeIgniter\\CodeIgniter",
+            "type": "->",
+            "args": [
+                {}
+            ]
+        },
+        {
+            "file": "C:\\xampp\\htdocs\\makeironi-apps-vue-ci\\public\\index.php",
+            "line": 44,
+            "function": "run",
+            "class": "CodeIgniter\\CodeIgniter",
+            "type": "->",
+            "args": []
+        },
+        {
+            "file": "C:\\xampp\\htdocs\\makeironi-apps-vue-ci\\vendor\\codeigniter4\\framework\\system\\Commands\\Server\\rewrite.php",
+            "line": 45,
+            "args": [
+                "C:\\xampp\\htdocs\\makeironi-apps-vue-ci\\public\\index.php"
+            ],
+            "function": "require_once"
+        }
+    ]
+}

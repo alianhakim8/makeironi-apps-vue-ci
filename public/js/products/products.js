@@ -21,7 +21,7 @@ var vm = new Vue({
   methods: {
     // get from database
     getAllProduct() {
-      axios.get("/product-all-json").then((response) => {
+      axios.get("/api/user/product/all-json").then((response) => {
         // console.log(response.data);
         this.products = response.data;
       });

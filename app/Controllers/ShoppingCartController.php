@@ -35,10 +35,57 @@ class ShoppingCartController extends BaseController
                 ];
             }
 
-            // $valid = $this->model->product_cart_validation($json->id_product, $json->id_customer);
-
-            // var_dump($valid);
+            $valid = $this->model->product_cart_validation($json->id_product, $json->id_customer);
+            // var_dump(, );
             // die;
+
+
+            if (count($valid) == 0) {
+
+                $this->model->insert($data);
+
+                return $this->respond([
+                    'code' => 201,
+                    'message' => 'Berhasil menambahkan ke cart'
+                ], 201);
+            } else {
+
+                if ($valid[0]['id_product'] == $json->id_product && $valid[0]['id_customer'] == $json->id_customer) {
+                    return $this->respond([
+                        'code' => 500,
+                        'message' => 'Produk sudah ada di cart'
+                    ], 500);
+                } else if ($valid[0]['id_product'] != $json->id_product && $valid[0]['id_customer'] == $json->id_customer) {
+
+                    $this->model->insert($data);
+
+                    return $this->respond([
+                        'code' => 201,
+                        'message' => 'Berhasil menambahkan ke cart'
+                    ], 201);
+                }
+            }
+            // try {
+            //     if ($valid[0]['id_product'] != $data['id_product'] && $valid[0]['id_customer'] == $data['id_customer']) {
+            //         $this->model->insert($data);
+
+            //         return $this->respond([
+            //             'code' => 201,
+            //             'message' => 'Add to cart successfully'
+            //         ], 201);
+            //     } else {
+            //         return $this->respond([
+            //             'code' => 500,
+            //             'message' => 'Add to cart successfully'
+            //         ], 500);
+            //     }
+            //     // return view('cart/cart');
+
+            // } catch (\Throwable $th) {
+            //     return json_encode([
+            //         'error' => $th->getMessage()
+            //     ], 500);
+            // }
 
             // if (count($valid) > 0) {
             // $update_rows = array('quantity' => $new_quantity);
@@ -46,13 +93,12 @@ class ShoppingCartController extends BaseController
             // $this->model->where('id_product', $json->id_product);
             // $this->model->update($update_rows);
             // } else {
-            $this->model->insert($data);
+
             // }
             // return $this->respond([
             //     'code' => 201,
             //     'message' => 'Add to cart successfully'
             // ], 201);
-            return view('cart/cart');
         }
     }
 

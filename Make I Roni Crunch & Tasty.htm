@@ -1,0 +1,2327 @@
+<!-- DEBUG-VIEW START 4 APPPATH\Views\cart\cart.php -->
+<!-- DEBUG-VIEW START 3 APPPATH\Views\layout\template.php -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<script type="text/javascript" async="" src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/shopifyWidget.js"></script><script type="text/javascript" id="debugbar_loader" data-time="1620879349" src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/index.js"></script><script type="text/javascript" id="debugbar_dynamic_script">
+	/*
+ * Functionality for the CodeIgniter Debug Toolbar.
+ */
+
+var ciDebugBar = {
+
+	toolbarContainer : null,
+	toolbar : null,
+	icon : null,
+
+	//--------------------------------------------------------------------
+
+	init : function () {
+		this.toolbarContainer = document.getElementById('toolbarContainer');
+		this.toolbar          = document.getElementById('debug-bar');
+		this.icon             = document.getElementById('debug-icon');
+
+		ciDebugBar.createListeners();
+		ciDebugBar.setToolbarState();
+		ciDebugBar.setToolbarPosition();
+		ciDebugBar.setToolbarTheme();
+		ciDebugBar.toggleViewsHints();
+		ciDebugBar.routerLink();
+
+		document.getElementById('debug-bar-link').addEventListener('click', ciDebugBar.toggleToolbar, true);
+		document.getElementById('debug-icon-link').addEventListener('click', ciDebugBar.toggleToolbar, true);
+
+		// Allows to highlight the row of the current history request
+		var btn = document.querySelector('button[data-time="' + localStorage.getItem('debugbar-time') + '"]');
+		ciDebugBar.addClass(btn.parentNode.parentNode, 'current');
+
+		historyLoad = document.getElementsByClassName('ci-history-load');
+
+		for (var i = 0; i < historyLoad.length; i++)
+		{
+			historyLoad[i].addEventListener('click', function () {
+				loadDoc(this.getAttribute('data-time'));
+			}, true);
+		}
+
+		// Display the active Tab on page load
+		var tab = ciDebugBar.readCookie('debug-bar-tab');
+		if (document.getElementById(tab))
+		{
+			var el           = document.getElementById(tab);
+			el.style.display = 'block';
+			ciDebugBar.addClass(el, 'active');
+			tab = document.querySelector('[data-tab=' + tab + ']');
+			if (tab)
+			{
+				ciDebugBar.addClass(tab.parentNode, 'active');
+			}
+		}
+	},
+
+	//--------------------------------------------------------------------
+
+	createListeners : function () {
+		var buttons = [].slice.call(document.querySelectorAll('#debug-bar .ci-label a'));
+
+		for (var i = 0; i < buttons.length; i++)
+		{
+			buttons[i].addEventListener('click', ciDebugBar.showTab, true);
+		}
+	},
+
+	//--------------------------------------------------------------------
+
+	showTab: function () {
+		// Get the target tab, if any
+		var tab = document.getElementById(this.getAttribute('data-tab'));
+
+		// If the label have not a tab stops here
+		if (! tab)
+		{
+			return;
+		}
+
+		// Remove debug-bar-tab cookie
+		ciDebugBar.createCookie('debug-bar-tab', '', -1);
+
+		// Check our current state.
+		var state = tab.style.display;
+
+		// Hide all tabs
+		var tabs = document.querySelectorAll('#debug-bar .tab');
+
+		for (var i = 0; i < tabs.length; i++)
+		{
+			tabs[i].style.display = 'none';
+		}
+
+		// Mark all labels as inactive
+		var labels = document.querySelectorAll('#debug-bar .ci-label');
+
+		for (var i = 0; i < labels.length; i++)
+		{
+			ciDebugBar.removeClass(labels[i], 'active');
+		}
+
+		// Show/hide the selected tab
+		if (state != 'block')
+		{
+			tab.style.display = 'block';
+			ciDebugBar.addClass(this.parentNode, 'active');
+			// Create debug-bar-tab cookie to persistent state
+			ciDebugBar.createCookie('debug-bar-tab', this.getAttribute('data-tab'), 365);
+		}
+	},
+
+	//--------------------------------------------------------------------
+
+	addClass : function (el, className) {
+		if (el.classList)
+		{
+			el.classList.add(className);
+		}
+		else
+		{
+			el.className += ' ' + className;
+		}
+	},
+
+	//--------------------------------------------------------------------
+
+	removeClass : function (el, className) {
+		if (el.classList)
+		{
+			el.classList.remove(className);
+		}
+		else
+		{
+			el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+		}
+	},
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Toggle display of a data table
+	 *
+	 * @param obj
+	 */
+	toggleDataTable : function (obj) {
+		if (typeof obj == 'string')
+		{
+			obj = document.getElementById(obj + '_table');
+		}
+
+		if (obj)
+		{
+			obj.style.display = obj.style.display == 'none' ? 'block' : 'none';
+		}
+	},
+
+	//--------------------------------------------------------------------
+
+	/**
+	 *   Toggle tool bar from full to icon and icon to full
+	 */
+	toggleToolbar : function () {
+		var open = ciDebugBar.toolbar.style.display != 'none';
+
+		ciDebugBar.icon.style.display    = open == true ? 'inline-block' : 'none';
+		ciDebugBar.toolbar.style.display = open == false ? 'inline-block' : 'none';
+
+		// Remember it for other page loads on this site
+		ciDebugBar.createCookie('debug-bar-state', '', -1);
+		ciDebugBar.createCookie('debug-bar-state', open == true ? 'minimized' : 'open' , 365);
+	},
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Sets the initial state of the toolbar (open or minimized) when
+	 * the page is first loaded to allow it to remember the state between refreshes.
+	 */
+	setToolbarState: function () {
+		var open = ciDebugBar.readCookie('debug-bar-state');
+
+		ciDebugBar.icon.style.display    = open != 'open' ? 'inline-block' : 'none';
+		ciDebugBar.toolbar.style.display = open == 'open' ? 'inline-block' : 'none';
+	},
+
+	//--------------------------------------------------------------------
+
+	toggleViewsHints: function () {
+		// Avoid toggle hints on history requests that are not the initial
+		if (localStorage.getItem('debugbar-time') != localStorage.getItem('debugbar-time-new'))
+		{
+			var a  = document.querySelector('a[data-tab="ci-views"]');
+			a.href = '#';
+			return;
+		}
+
+		var nodeList       = []; // [ Element, NewElement( 1 )/OldElement( 0 ) ]
+		var sortedComments = [];
+		var comments       = [];
+
+		var getComments = function () {
+			var nodes        = [];
+			var result       = [];
+			var xpathResults = document.evaluate( "//comment()[starts-with(., ' DEBUG-VIEW')]", document, null, XPathResult.ANY_TYPE, null);
+			var nextNode     = xpathResults.iterateNext();
+			while ( nextNode )
+			{
+				nodes.push( nextNode );
+				nextNode = xpathResults.iterateNext();
+			}
+
+			// sort comment by opening and closing tags
+			for (var i = 0; i < nodes.length; ++i)
+			{
+				// get file path + name to use as key
+				var path = nodes[i].nodeValue.substring( 18, nodes[i].nodeValue.length - 1 );
+
+				if ( nodes[i].nodeValue[12] === 'S' ) // simple check for start comment
+				{
+					// create new entry
+					result[path] = [ nodes[i], null ];
+				}
+				else if (result[path])
+				{
+					// add to existing entry
+					result[path][1] = nodes[i];
+				}
+			}
+
+			return result;
+		};
+
+		// find node that has TargetNode as parentNode
+		var getParentNode = function ( node, targetNode ) {
+			if ( node.parentNode === null )
+			{
+				return null;
+			}
+
+			if ( node.parentNode !== targetNode )
+			{
+				return getParentNode( node.parentNode, targetNode );
+			}
+
+			return node;
+		};
+
+		// define invalid & outer ( also invalid ) elements
+		const INVALID_ELEMENTS = [ 'NOSCRIPT', 'SCRIPT', 'STYLE' ];
+		const OUTER_ELEMENTS   = [ 'HTML', 'BODY', 'HEAD' ];
+
+		var getValidElementInner = function ( node, reverse ) {
+			// handle invalid tags
+			if ( OUTER_ELEMENTS.indexOf( node.nodeName ) !== -1 )
+			{
+				for (var i = 0; i < document.body.children.length; ++i)
+				{
+					var index   = reverse ? document.body.children.length - ( i + 1 ) : i;
+					var element = document.body.children[index];
+
+					// skip invalid tags
+					if ( INVALID_ELEMENTS.indexOf( element.nodeName ) !== -1 )
+					{
+						continue;
+					}
+
+					return [ element, reverse ];
+				}
+
+				return null;
+			}
+
+			// get to next valid element
+			while ( node !== null && INVALID_ELEMENTS.indexOf( node.nodeName ) !== -1 )
+			{
+				node = reverse ? node.previousElementSibling : node.nextElementSibling;
+			}
+
+			// return non array if we couldnt find something
+			if ( node === null )
+			{
+				return null;
+			}
+
+			return [ node, reverse ];
+		};
+
+		// get next valid element ( to be safe to add divs )
+		// @return [ element, skip element ] or null if we couldnt find a valid place
+		var getValidElement = function ( nodeElement ) {
+			if (nodeElement)
+			{
+				if ( nodeElement.nextElementSibling !== null )
+				{
+					return getValidElementInner( nodeElement.nextElementSibling, false )
+						|| getValidElementInner( nodeElement.previousElementSibling, true );
+				}
+				if ( nodeElement.previousElementSibling !== null )
+				{
+					return getValidElementInner( nodeElement.previousElementSibling, true );
+				}
+			}
+
+			// something went wrong! -> element is not in DOM
+			return null;
+		};
+
+		function showHints()
+		{
+			// Had AJAX? Reset view blocks
+			sortedComments = getComments();
+
+			for (var key in sortedComments)
+			{
+				var startElement = getValidElement( sortedComments[key][0] );
+				var endElement   = getValidElement( sortedComments[key][1] );
+
+				// skip if we couldnt get a valid element
+				if ( startElement === null || endElement === null )
+				{
+					continue;
+				}
+
+				// find element which has same parent as startelement
+				var jointParent = getParentNode( endElement[0], startElement[0].parentNode );
+				if ( jointParent === null )
+				{
+					// find element which has same parent as endelement
+					jointParent = getParentNode( startElement[0], endElement[0].parentNode );
+					if ( jointParent === null )
+					{
+						// both tries failed
+						continue;
+					}
+					else
+					{
+						startElement[0] = jointParent;
+					}
+				}
+				else
+				{
+					endElement[0] = jointParent;
+				}
+
+				var debugDiv   = document.createElement( 'div' ); // holder
+				var debugPath  = document.createElement( 'div' ); // path
+				var childArray = startElement[0].parentNode.childNodes; // target child array
+				var parent     = startElement[0].parentNode;
+				var start, end;
+
+				// setup container
+				debugDiv.classList.add( 'debug-view' );
+				debugDiv.classList.add( 'show-view' );
+				debugPath.classList.add( 'debug-view-path' );
+				debugPath.innerText = key;
+				debugDiv.appendChild( debugPath );
+
+				// calc distance between them
+				// start
+				for (var i = 0; i < childArray.length; ++i)
+				{
+					// check for comment ( start & end ) -> if its before valid start element
+					if ( childArray[i] === sortedComments[key][1] ||
+						childArray[i] === sortedComments[key][0] ||
+						childArray[i] === startElement[0] )
+					{
+						start = i;
+						if ( childArray[i] === sortedComments[key][0] )
+						{
+							start++; // increase to skip the start comment
+						}
+						break;
+					}
+				}
+				// adjust if we want to skip the start element
+				if ( startElement[1] )
+				{
+					start++;
+				}
+
+				// end
+				for (var i = start; i < childArray.length; ++i)
+				{
+					if ( childArray[i] === endElement[0] )
+					{
+						end = i;
+						// dont break to check for end comment after end valid element
+					}
+					else if ( childArray[i] === sortedComments[key][1] )
+					{
+						// if we found the end comment, we can break
+						end = i;
+						break;
+					}
+				}
+
+				// move elements
+				var number = end - start;
+				if ( endElement[1] )
+				{
+					number++;
+				}
+				for (var i = 0; i < number; ++i)
+				{
+					if ( INVALID_ELEMENTS.indexOf( childArray[start] ) !== -1 )
+					{
+						// skip invalid childs that can cause problems if moved
+						start++;
+						continue;
+					}
+					debugDiv.appendChild( childArray[start] );
+				}
+
+				// add container to DOM
+				nodeList.push( parent.insertBefore( debugDiv, childArray[start] ) );
+			}
+
+			ciDebugBar.createCookie('debug-view', 'show', 365);
+			ciDebugBar.addClass(btn, 'active');
+		}
+
+		function hideHints()
+		{
+			for (var i = 0; i < nodeList.length; ++i)
+			{
+				var index;
+
+				// find index
+				for (var j = 0; j < nodeList[i].parentNode.childNodes.length; ++j)
+				{
+					if ( nodeList[i].parentNode.childNodes[j] === nodeList[i] )
+					{
+						index = j;
+						break;
+					}
+				}
+
+				// move child back
+				while ( nodeList[i].childNodes.length !== 1 )
+				{
+					nodeList[i].parentNode.insertBefore( nodeList[i].childNodes[1], nodeList[i].parentNode.childNodes[index].nextSibling  );
+					index++;
+				}
+
+				nodeList[i].parentNode.removeChild( nodeList[i] );
+			}
+			nodeList.length = 0;
+
+			ciDebugBar.createCookie('debug-view', '', -1);
+			ciDebugBar.removeClass(btn, 'active');
+		}
+
+		var btn = document.querySelector('[data-tab=ci-views]');
+
+		// If the Views Collector is inactive stops here
+		if (! btn)
+		{
+			return;
+		}
+
+		btn.parentNode.onclick = function () {
+			if (ciDebugBar.readCookie('debug-view'))
+			{
+				hideHints();
+			}
+			else
+			{
+				showHints();
+			}
+		};
+
+		// Determine Hints state on page load
+		if (ciDebugBar.readCookie('debug-view'))
+		{
+			showHints();
+		}
+	},
+
+	//--------------------------------------------------------------------
+
+	setToolbarPosition: function () {
+		var btnPosition = document.getElementById('toolbar-position');
+
+		if (ciDebugBar.readCookie('debug-bar-position') === 'top')
+		{
+			ciDebugBar.addClass(ciDebugBar.icon, 'fixed-top');
+			ciDebugBar.addClass(ciDebugBar.toolbar, 'fixed-top');
+		}
+
+		btnPosition.addEventListener('click', function () {
+			var position = ciDebugBar.readCookie('debug-bar-position');
+
+			ciDebugBar.createCookie('debug-bar-position', '', -1);
+
+			if (!position || position === 'bottom')
+			{
+				ciDebugBar.createCookie('debug-bar-position', 'top', 365);
+				ciDebugBar.addClass(ciDebugBar.icon, 'fixed-top');
+				ciDebugBar.addClass(ciDebugBar.toolbar, 'fixed-top');
+			}
+			else
+			{
+				ciDebugBar.createCookie('debug-bar-position', 'bottom', 365);
+				ciDebugBar.removeClass(ciDebugBar.icon, 'fixed-top');
+				ciDebugBar.removeClass(ciDebugBar.toolbar, 'fixed-top');
+			}
+		}, true);
+	},
+
+	//--------------------------------------------------------------------
+
+	setToolbarTheme: function () {
+		var btnTheme    = document.getElementById('toolbar-theme');
+		var isDarkMode  = window.matchMedia("(prefers-color-scheme: dark)").matches;
+		var isLightMode = window.matchMedia("(prefers-color-scheme: light)").matches;
+
+		// If a cookie is set with a value, we force the color scheme
+		if (ciDebugBar.readCookie('debug-bar-theme') === 'dark')
+		{
+			ciDebugBar.removeClass(ciDebugBar.toolbarContainer, 'light');
+			ciDebugBar.addClass(ciDebugBar.toolbarContainer, 'dark');
+		}
+		else if (ciDebugBar.readCookie('debug-bar-theme') === 'light')
+		{
+			ciDebugBar.removeClass(ciDebugBar.toolbarContainer, 'dark');
+			ciDebugBar.addClass(ciDebugBar.toolbarContainer, 'light');
+		}
+
+		btnTheme.addEventListener('click', function () {
+			var theme = ciDebugBar.readCookie('debug-bar-theme');
+
+			if (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches)
+			{
+				// If there is no cookie, and "prefers-color-scheme" is set to "dark"
+				// It means that the user wants to switch to light mode
+				ciDebugBar.createCookie('debug-bar-theme', 'light', 365);
+				ciDebugBar.removeClass(ciDebugBar.toolbarContainer, 'dark');
+				ciDebugBar.addClass(ciDebugBar.toolbarContainer, 'light');
+			}
+			else
+			{
+				if (theme === 'dark')
+				{
+					ciDebugBar.createCookie('debug-bar-theme', 'light', 365);
+					ciDebugBar.removeClass(ciDebugBar.toolbarContainer, 'dark');
+					ciDebugBar.addClass(ciDebugBar.toolbarContainer, 'light');
+				}
+				else
+				{
+					// In any other cases: if there is no cookie, or the cookie is set to
+					// "light", or the "prefers-color-scheme" is "light"...
+					ciDebugBar.createCookie('debug-bar-theme', 'dark', 365);
+					ciDebugBar.removeClass(ciDebugBar.toolbarContainer, 'light');
+					ciDebugBar.addClass(ciDebugBar.toolbarContainer, 'dark');
+				}
+			}
+		}, true);
+	},
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Helper to create a cookie.
+	 *
+	 * @param name
+	 * @param value
+	 * @param days
+	 */
+	createCookie : function (name,value,days) {
+		if (days)
+		{
+			var date = new Date();
+
+			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+
+			var expires = "; expires=" + date.toGMTString();
+		}
+		else
+		{
+			var expires = "";
+		}
+
+		document.cookie = name + "=" + value + expires + "; path=/; samesite=Lax";
+	},
+
+	//--------------------------------------------------------------------
+
+	readCookie : function (name) {
+		var nameEQ = name + "=";
+		var ca     = document.cookie.split(';');
+
+		for (var i = 0; i < ca.length; i++)
+		{
+			var c = ca[i];
+			while (c.charAt(0) == ' ')
+			{
+				c = c.substring(1,c.length);
+			}
+			if (c.indexOf(nameEQ) == 0)
+			{
+				return c.substring(nameEQ.length,c.length);
+			}
+		}
+		return null;
+	},
+
+	//--------------------------------------------------------------------
+
+	trimSlash: function (text) {
+		return text.replace(/^\/|\/$/g, '');
+	},
+
+	routerLink: function () {
+		var row, _location;
+		var rowGet = document.querySelectorAll('#debug-bar td[data-debugbar-route="GET"]');
+		var patt   = /\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/;
+
+		for (var i = 0; i < rowGet.length; i++)
+		{
+			row = rowGet[i];
+			if (!/\/\(.+?\)/.test(rowGet[i].innerText))
+			{
+				row.style = 'cursor: pointer;';
+				row.setAttribute('title', location.origin + '/' + ciDebugBar.trimSlash(row.innerText));
+				row.addEventListener('click', function (ev) {
+					_location          = location.origin + '/' + ciDebugBar.trimSlash(ev.target.innerText);
+					var redirectWindow = window.open(_location, '_blank');
+					redirectWindow.location;
+				});
+			}
+			else
+			{
+				row.innerHTML = '<div>' + row.innerText + '</div>'
+					+ '<form data-debugbar-route-tpl="' + ciDebugBar.trimSlash(row.innerText.replace(patt, '?')) + '">'
+					+ row.innerText.replace(patt, '<input type="text" placeholder="$1">')
+					+ '<input type="submit" value="Go" style="margin-left: 4px;">'
+					+ '</form>';
+			}
+		}
+
+		rowGet = document.querySelectorAll('#debug-bar td[data-debugbar-route="GET"] form');
+		for (var i = 0; i < rowGet.length; i++)
+		{
+			row = rowGet[i];
+
+			row.addEventListener('submit', function (event) {
+				event.preventDefault()
+				var inputArray = [], t = 0;
+				var input      = event.target.querySelectorAll('input[type=text]');
+				var tpl        = event.target.getAttribute('data-debugbar-route-tpl');
+
+				for (var n = 0; n < input.length; n++)
+				{
+					if (input[n].value.length > 0)
+					{
+						inputArray.push(input[n].value);
+					}
+				}
+
+				if (inputArray.length > 0)
+				{
+					_location = location.origin + '/' + tpl.replace(/\?/g, function () {
+						return inputArray[t++]
+					});
+
+					var redirectWindow = window.open(_location, '_blank');
+					redirectWindow.location;
+				}
+			})
+		}
+	}
+
+};
+</script><style type="text/css" id="debugbar_dynamic_style">
+	/*! CodeIgniter 4 - Debug bar * ============================================================================ * Forum: https://forum.codeigniter.com * Github: https://github.com/codeigniter4/codeigniter4 * Slack: https://codeigniterchat.slack.com * Website: https://codeigniter.com */ #debug-icon { bottom: 0; position: fixed; right: 0; z-index: 10000; height: 36px; width: 36px; margin: 0px; padding: 0px; clear: both; text-align: center; } #debug-icon a svg { margin: 8px; max-width: 20px; max-height: 20px; } #debug-icon.fixed-top { bottom: auto; top: 0; } #debug-icon .debug-bar-ndisplay { display: none; } #debug-bar { bottom: 0; left: 0; position: fixed; right: 0; z-index: 10000; height: 36px; line-height: 36px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; font-size: 16px; font-weight: 400; } #debug-bar h1 { bottom: 0; display: inline-block; font-size: 14px; font-weight: normal; margin: 0 16px 0 0; padding: 0; position: absolute; right: 30px; text-align: left; top: 0; } #debug-bar h1 svg { width: 16px; margin-right: 5px; } #debug-bar h2 { font-size: 16px; margin: 0; padding: 5px 0 10px 0; } #debug-bar h2 span { font-size: 13px; } #debug-bar h3 { font-size: 12px; font-weight: 200; margin: 0 0 0 10px; padding: 0; text-transform: uppercase; } #debug-bar p { font-size: 12px; margin: 0 0 0 15px; padding: 0; } #debug-bar a { text-decoration: none; } #debug-bar a:hover { text-decoration: underline; } #debug-bar button { border: 1px solid; border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px; cursor: pointer; line-height: 15px; } #debug-bar button:hover { text-decoration: underline; } #debug-bar table { border-collapse: collapse; font-size: 14px; line-height: normal; margin: 5px 10px 15px 10px; width: calc(100% - 10px); } #debug-bar table strong { font-weight: 500; } #debug-bar table th { display: table-cell; font-weight: 600; padding-bottom: 0.7em; text-align: left; } #debug-bar table tr { border: none; } #debug-bar table td { border: none; display: table-cell; margin: 0; text-align: left; } #debug-bar table td:first-child { max-width: 20%; } #debug-bar table td:first-child.narrow { width: 7em; } #debug-bar td[data-debugbar-route] form { display: none; } #debug-bar td[data-debugbar-route]:hover form { display: block; } #debug-bar td[data-debugbar-route]:hover > div { display: none; } #debug-bar td[data-debugbar-route] input[type=text] { padding: 2px; } #debug-bar .toolbar { display: flex; overflow: hidden; overflow-y: auto; padding: 0 12px 0 12px; /* give room for OS X scrollbar */ white-space: nowrap; z-index: 10000; } #debug-bar.fixed-top { bottom: auto; top: 0; } #debug-bar.fixed-top .tab { bottom: auto; top: 36px; } #debug-bar #toolbar-position a, #debug-bar #toolbar-theme a { padding: 0 6px; display: inline-flex; vertical-align: top; } #debug-bar #toolbar-position a:hover, #debug-bar #toolbar-theme a:hover { text-decoration: none; } #debug-bar #debug-bar-link { bottom: 0; display: inline-block; font-size: 16px; line-height: 36px; padding: 6px; position: absolute; right: 10px; top: 0; width: 24px; } #debug-bar .ci-label { display: inline-flex; font-size: 14px; } #debug-bar .ci-label:hover { cursor: pointer; } #debug-bar .ci-label a { color: inherit; display: flex; letter-spacing: normal; padding: 0 10px; text-decoration: none; align-items: center; } #debug-bar .ci-label img { margin: 6px 3px 6px 0; width: 16px !important; } #debug-bar .ci-label .badge { border-radius: 12px; -moz-border-radius: 12px; -webkit-border-radius: 12px; display: inline-block; font-size: 75%; font-weight: bold; line-height: 12px; margin-left: 5px; padding: 2px 5px; text-align: center; vertical-align: baseline; white-space: nowrap; } #debug-bar .tab { bottom: 35px; display: none; left: 0; max-height: 62%; overflow: hidden; overflow-y: auto; padding: 1em 2em; position: fixed; right: 0; z-index: 9999; } #debug-bar .timeline { margin-left: 0; width: 100%; } #debug-bar .timeline th { border-left: 1px solid; font-size: 12px; font-weight: 200; padding: 5px 5px 10px 5px; position: relative; text-align: left; } #debug-bar .timeline th:first-child { border-left: 0; } #debug-bar .timeline td { border-left: 1px solid; padding: 5px; position: relative; } #debug-bar .timeline td:first-child { border-left: 0; } #debug-bar .timeline .timer { border-radius: 4px; -moz-border-radius: 4px; -webkit-border-radius: 4px; display: inline-block; padding: 5px; position: absolute; top: 30%; } #debug-bar .route-params, #debug-bar .route-params-item { vertical-align: top; } #debug-bar .route-params td:first-child, #debug-bar .route-params-item td:first-child { font-style: italic; padding-left: 1em; text-align: right; } .debug-view.show-view { border: 1px solid; margin: 4px; } .debug-view-path { font-family: monospace; font-size: 12px; letter-spacing: normal; min-height: 16px; padding: 2px; text-align: left; } .show-view .debug-view-path { display: block !important; } @media screen and (max-width: 1024px) { #debug-bar .ci-label img { margin: unset; } .hide-sm { display: none !important; } } #debug-icon { background-color: #FFFFFF; box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #debug-icon a:active, #debug-icon a:link, #debug-icon a:visited { color: #DD8615; } #debug-bar { background-color: #FFFFFF; color: #434343; } #debug-bar h1, #debug-bar h2, #debug-bar h3, #debug-bar p, #debug-bar a, #debug-bar button, #debug-bar table, #debug-bar thead, #debug-bar tr, #debug-bar td, #debug-bar button, #debug-bar .toolbar { background-color: transparent; color: #434343; } #debug-bar button { background-color: #FFFFFF; } #debug-bar table strong { color: #FDC894; } #debug-bar table tbody tr:hover { background-color: #DFDFDF; } #debug-bar table tbody tr.current { background-color: #FDC894; } #debug-bar table tbody tr.current:hover td { background-color: #DD4814; color: #FFFFFF; } #debug-bar .toolbar { background-color: #FFFFFF; box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #debug-bar .toolbar img { filter: brightness(0) invert(0.4); } #debug-bar.fixed-top .toolbar { box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #debug-bar.fixed-top .tab { box-shadow: 0 1px 4px #DFDFDF; -moz-box-shadow: 0 1px 4px #DFDFDF; -webkit-box-shadow: 0 1px 4px #DFDFDF; } #debug-bar .muted { color: #434343; } #debug-bar .muted td { color: #DFDFDF; } #debug-bar .muted:hover td { color: #434343; } #debug-bar #toolbar-position, #debug-bar #toolbar-theme { filter: brightness(0) invert(0.6); } #debug-bar .ci-label.active { background-color: #DFDFDF; } #debug-bar .ci-label:hover { background-color: #DFDFDF; } #debug-bar .ci-label .badge { background-color: #5BC0DE; color: #FFFFFF; } #debug-bar .tab { background-color: #FFFFFF; box-shadow: 0 -1px 4px #DFDFDF; -moz-box-shadow: 0 -1px 4px #DFDFDF; -webkit-box-shadow: 0 -1px 4px #DFDFDF; } #debug-bar .timeline th, #debug-bar .timeline td { border-color: #DFDFDF; } #debug-bar .timeline .timer { background-color: #DD8615; } .debug-view.show-view { border-color: #DD8615; } .debug-view-path { background-color: #FDC894; color: #434343; } @media (prefers-color-scheme: dark) { #debug-icon { background-color: #252525; box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #debug-icon a:active, #debug-icon a:link, #debug-icon a:visited { color: #DD8615; } #debug-bar { background-color: #252525; color: #DFDFDF; } #debug-bar h1, #debug-bar h2, #debug-bar h3, #debug-bar p, #debug-bar a, #debug-bar button, #debug-bar table, #debug-bar thead, #debug-bar tr, #debug-bar td, #debug-bar button, #debug-bar .toolbar { background-color: transparent; color: #DFDFDF; } #debug-bar button { background-color: #252525; } #debug-bar table strong { color: #FDC894; } #debug-bar table tbody tr:hover { background-color: #434343; } #debug-bar table tbody tr.current { background-color: #FDC894; } #debug-bar table tbody tr.current td { color: #252525; } #debug-bar table tbody tr.current:hover td { background-color: #DD4814; color: #FFFFFF; } #debug-bar .toolbar { background-color: #434343; box-shadow: 0 0 4px #434343; -moz-box-shadow: 0 0 4px #434343; -webkit-box-shadow: 0 0 4px #434343; } #debug-bar .toolbar img { filter: brightness(0) invert(1); } #debug-bar.fixed-top .toolbar { box-shadow: 0 0 4px #434343; -moz-box-shadow: 0 0 4px #434343; -webkit-box-shadow: 0 0 4px #434343; } #debug-bar.fixed-top .tab { box-shadow: 0 1px 4px #434343; -moz-box-shadow: 0 1px 4px #434343; -webkit-box-shadow: 0 1px 4px #434343; } #debug-bar .muted { color: #DFDFDF; } #debug-bar .muted td { color: #434343; } #debug-bar .muted:hover td { color: #DFDFDF; } #debug-bar #toolbar-position, #debug-bar #toolbar-theme { filter: brightness(0) invert(0.6); } #debug-bar .ci-label.active { background-color: #252525; } #debug-bar .ci-label:hover { background-color: #252525; } #debug-bar .ci-label .badge { background-color: #5BC0DE; color: #DFDFDF; } #debug-bar .tab { background-color: #252525; box-shadow: 0 -1px 4px #434343; -moz-box-shadow: 0 -1px 4px #434343; -webkit-box-shadow: 0 -1px 4px #434343; } #debug-bar .timeline th, #debug-bar .timeline td { border-color: #434343; } #debug-bar .timeline .timer { background-color: #DD8615; } .debug-view.show-view { border-color: #DD8615; } .debug-view-path { background-color: #FDC894; color: #434343; } } #toolbarContainer.dark #debug-icon { background-color: #252525; box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #toolbarContainer.dark #debug-icon a:active, #toolbarContainer.dark #debug-icon a:link, #toolbarContainer.dark #debug-icon a:visited { color: #DD8615; } #toolbarContainer.dark #debug-bar { background-color: #252525; color: #DFDFDF; } #toolbarContainer.dark #debug-bar h1, #toolbarContainer.dark #debug-bar h2, #toolbarContainer.dark #debug-bar h3, #toolbarContainer.dark #debug-bar p, #toolbarContainer.dark #debug-bar a, #toolbarContainer.dark #debug-bar button, #toolbarContainer.dark #debug-bar table, #toolbarContainer.dark #debug-bar thead, #toolbarContainer.dark #debug-bar tr, #toolbarContainer.dark #debug-bar td, #toolbarContainer.dark #debug-bar button, #toolbarContainer.dark #debug-bar .toolbar { background-color: transparent; color: #DFDFDF; } #toolbarContainer.dark #debug-bar button { background-color: #252525; } #toolbarContainer.dark #debug-bar table strong { color: #FDC894; } #toolbarContainer.dark #debug-bar table tbody tr:hover { background-color: #434343; } #toolbarContainer.dark #debug-bar table tbody tr.current { background-color: #FDC894; } #toolbarContainer.dark #debug-bar table tbody tr.current td { color: #252525; } #toolbarContainer.dark #debug-bar table tbody tr.current:hover td { background-color: #DD4814; color: #FFFFFF; } #toolbarContainer.dark #debug-bar .toolbar { background-color: #434343; box-shadow: 0 0 4px #434343; -moz-box-shadow: 0 0 4px #434343; -webkit-box-shadow: 0 0 4px #434343; } #toolbarContainer.dark #debug-bar .toolbar img { filter: brightness(0) invert(1); } #toolbarContainer.dark #debug-bar.fixed-top .toolbar { box-shadow: 0 0 4px #434343; -moz-box-shadow: 0 0 4px #434343; -webkit-box-shadow: 0 0 4px #434343; } #toolbarContainer.dark #debug-bar.fixed-top .tab { box-shadow: 0 1px 4px #434343; -moz-box-shadow: 0 1px 4px #434343; -webkit-box-shadow: 0 1px 4px #434343; } #toolbarContainer.dark #debug-bar .muted { color: #DFDFDF; } #toolbarContainer.dark #debug-bar .muted td { color: #434343; } #toolbarContainer.dark #debug-bar .muted:hover td { color: #DFDFDF; } #toolbarContainer.dark #debug-bar #toolbar-position, #toolbarContainer.dark #debug-bar #toolbar-theme { filter: brightness(0) invert(0.6); } #toolbarContainer.dark #debug-bar .ci-label.active { background-color: #252525; } #toolbarContainer.dark #debug-bar .ci-label:hover { background-color: #252525; } #toolbarContainer.dark #debug-bar .ci-label .badge { background-color: #5BC0DE; color: #DFDFDF; } #toolbarContainer.dark #debug-bar .tab { background-color: #252525; box-shadow: 0 -1px 4px #434343; -moz-box-shadow: 0 -1px 4px #434343; -webkit-box-shadow: 0 -1px 4px #434343; } #toolbarContainer.dark #debug-bar .timeline th, #toolbarContainer.dark #debug-bar .timeline td { border-color: #434343; } #toolbarContainer.dark #debug-bar .timeline .timer { background-color: #DD8615; } #toolbarContainer.dark .debug-view.show-view { border-color: #DD8615; } #toolbarContainer.dark .debug-view-path { background-color: #FDC894; color: #434343; } #toolbarContainer.dark td[data-debugbar-route] input[type=text] { background: #000; color: #fff; } #toolbarContainer.light #debug-icon { background-color: #FFFFFF; box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #toolbarContainer.light #debug-icon a:active, #toolbarContainer.light #debug-icon a:link, #toolbarContainer.light #debug-icon a:visited { color: #DD8615; } #toolbarContainer.light #debug-bar { background-color: #FFFFFF; color: #434343; } #toolbarContainer.light #debug-bar h1, #toolbarContainer.light #debug-bar h2, #toolbarContainer.light #debug-bar h3, #toolbarContainer.light #debug-bar p, #toolbarContainer.light #debug-bar a, #toolbarContainer.light #debug-bar button, #toolbarContainer.light #debug-bar table, #toolbarContainer.light #debug-bar thead, #toolbarContainer.light #debug-bar tr, #toolbarContainer.light #debug-bar td, #toolbarContainer.light #debug-bar button, #toolbarContainer.light #debug-bar .toolbar { background-color: transparent; color: #434343; } #toolbarContainer.light #debug-bar button { background-color: #FFFFFF; } #toolbarContainer.light #debug-bar table strong { color: #FDC894; } #toolbarContainer.light #debug-bar table tbody tr:hover { background-color: #DFDFDF; } #toolbarContainer.light #debug-bar table tbody tr.current { background-color: #FDC894; } #toolbarContainer.light #debug-bar table tbody tr.current:hover td { background-color: #DD4814; color: #FFFFFF; } #toolbarContainer.light #debug-bar .toolbar { background-color: #FFFFFF; box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #toolbarContainer.light #debug-bar .toolbar img { filter: brightness(0) invert(0.4); } #toolbarContainer.light #debug-bar.fixed-top .toolbar { box-shadow: 0 0 4px #DFDFDF; -moz-box-shadow: 0 0 4px #DFDFDF; -webkit-box-shadow: 0 0 4px #DFDFDF; } #toolbarContainer.light #debug-bar.fixed-top .tab { box-shadow: 0 1px 4px #DFDFDF; -moz-box-shadow: 0 1px 4px #DFDFDF; -webkit-box-shadow: 0 1px 4px #DFDFDF; } #toolbarContainer.light #debug-bar .muted { color: #434343; } #toolbarContainer.light #debug-bar .muted td { color: #DFDFDF; } #toolbarContainer.light #debug-bar .muted:hover td { color: #434343; } #toolbarContainer.light #debug-bar #toolbar-position, #toolbarContainer.light #debug-bar #toolbar-theme { filter: brightness(0) invert(0.6); } #toolbarContainer.light #debug-bar .ci-label.active { background-color: #DFDFDF; } #toolbarContainer.light #debug-bar .ci-label:hover { background-color: #DFDFDF; } #toolbarContainer.light #debug-bar .ci-label .badge { background-color: #5BC0DE; color: #FFFFFF; } #toolbarContainer.light #debug-bar .tab { background-color: #FFFFFF; box-shadow: 0 -1px 4px #DFDFDF; -moz-box-shadow: 0 -1px 4px #DFDFDF; -webkit-box-shadow: 0 -1px 4px #DFDFDF; } #toolbarContainer.light #debug-bar .timeline th, #toolbarContainer.light #debug-bar .timeline td { border-color: #DFDFDF; } #toolbarContainer.light #debug-bar .timeline .timer { background-color: #DD8615; } #toolbarContainer.light .debug-view.show-view { border-color: #DD8615; } #toolbarContainer.light .debug-view-path { background-color: #FDC894; color: #434343; } .debug-bar-width30 { width: 30%; } .debug-bar-width10 { width: 10%; } .debug-bar-width70p { width: 70px; } .debug-bar-width140p { width: 140px; } .debug-bar-width20e { width: 20em; } .debug-bar-width6r { width: 6rem; } .debug-bar-ndisplay { display: none; } .debug-bar-alignRight { text-align: right; } .debug-bar-alignLeft { text-align: left; } .debug-bar-noverflow { overflow: hidden; } 
+		.debug-bar-timeline-0 {
+		left: 0.38027763366699%; width: 22.193193435669%;	}
+
+		.debug-bar-timeline-1 {
+		left: 22.576649983724%; width: 3.0235449473063%;	}
+
+		.debug-bar-timeline-2 {
+		left: 28.127034505208%; width: 59.036413828532%;	}
+
+		.debug-bar-timeline-3 {
+		left: 28.130213419596%; width: 14.12312189738%;	}
+
+		.debug-bar-timeline-4 {
+		left: 84.53369140625%; width: 0.62333333333333%;	}
+
+	</style>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CDN -->
+
+    <!-- Bootstrap CSS CDN -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous"> -->
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/style.css">
+    <!-- favicon -->
+    <link rel="icon" href="http://localhost:8080/img/favicon.ico" type="image/ico">
+
+    <!-- javascript CDN -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script> -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script> -->
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js" integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g==" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script> -->
+
+    <!-- Local Resource -->
+
+    <!--  Bootstrap CSS Local -->
+    <link href="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/bootstrap.css" rel="stylesheet">
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/style.css">
+
+    <!-- favicon -->
+    <link rel="icon" href="http://localhost:8080/img/favicon.ico" type="image/ico">
+
+    <!-- Javascript -->
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/vue.js"></script>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/axios.js"></script>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/jquery.js"></script>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/jquery-3.js"></script>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/sweetalert.js"></script><style>.swal2-popup.swal2-toast{flex-direction:column;align-items:stretch;width:auto;padding:1.25em;overflow-y:hidden;background:#fff;box-shadow:0 0 .625em #d9d9d9}.swal2-popup.swal2-toast .swal2-header{flex-direction:row;padding:0}.swal2-popup.swal2-toast .swal2-title{flex-grow:1;justify-content:flex-start;margin:0 .625em;font-size:1em}.swal2-popup.swal2-toast .swal2-loading{justify-content:center}.swal2-popup.swal2-toast .swal2-input{height:2em;margin:.3125em auto;font-size:1em}.swal2-popup.swal2-toast .swal2-validation-message{font-size:1em}.swal2-popup.swal2-toast .swal2-footer{margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-popup.swal2-toast .swal2-close{position:static;width:.8em;height:.8em;line-height:.8}.swal2-popup.swal2-toast .swal2-content{justify-content:flex-start;margin:0 .625em;padding:0;font-size:1em;text-align:initial}.swal2-popup.swal2-toast .swal2-html-container{padding:.625em 0 0}.swal2-popup.swal2-toast .swal2-html-container:empty{padding:0}.swal2-popup.swal2-toast .swal2-icon{width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:700}@media all and (-ms-high-contrast:none),(-ms-high-contrast:active){.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content{font-size:.25em}}.swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-popup.swal2-toast .swal2-actions{flex:1;flex-basis:auto!important;align-self:stretch;width:auto;height:2.2em;height:auto;margin:0 .3125em;margin-top:.3125em;padding:0}.swal2-popup.swal2-toast .swal2-styled{margin:.125em .3125em;padding:.3125em .625em;font-size:1em}.swal2-popup.swal2-toast .swal2-styled:focus{box-shadow:0 0 0 1px #fff,0 0 0 3px rgba(100,150,200,.5)}.swal2-popup.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;transform:rotate(45deg);border-radius:50%}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-.8em;left:-.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-popup.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{-webkit-animation:swal2-toast-animate-success-line-tip .75s;animation:swal2-toast-animate-success-line-tip .75s}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{-webkit-animation:swal2-toast-animate-success-line-long .75s;animation:swal2-toast-animate-success-line-long .75s}.swal2-popup.swal2-toast.swal2-show{-webkit-animation:swal2-toast-show .5s;animation:swal2-toast-show .5s}.swal2-popup.swal2-toast.swal2-hide{-webkit-animation:swal2-toast-hide .1s forwards;animation:swal2-toast-hide .1s forwards}.swal2-container{display:flex;position:fixed;z-index:1060;top:0;right:0;bottom:0;left:0;flex-direction:row;align-items:center;justify-content:center;padding:.625em;overflow-x:hidden;transition:background-color .1s;-webkit-overflow-scrolling:touch}.swal2-container.swal2-backdrop-show,.swal2-container.swal2-noanimation{background:rgba(0,0,0,.4)}.swal2-container.swal2-backdrop-hide{background:0 0!important}.swal2-container.swal2-top{align-items:flex-start}.swal2-container.swal2-top-left,.swal2-container.swal2-top-start{align-items:flex-start;justify-content:flex-start}.swal2-container.swal2-top-end,.swal2-container.swal2-top-right{align-items:flex-start;justify-content:flex-end}.swal2-container.swal2-center{align-items:center}.swal2-container.swal2-center-left,.swal2-container.swal2-center-start{align-items:center;justify-content:flex-start}.swal2-container.swal2-center-end,.swal2-container.swal2-center-right{align-items:center;justify-content:flex-end}.swal2-container.swal2-bottom{align-items:flex-end}.swal2-container.swal2-bottom-left,.swal2-container.swal2-bottom-start{align-items:flex-end;justify-content:flex-start}.swal2-container.swal2-bottom-end,.swal2-container.swal2-bottom-right{align-items:flex-end;justify-content:flex-end}.swal2-container.swal2-bottom-end>:first-child,.swal2-container.swal2-bottom-left>:first-child,.swal2-container.swal2-bottom-right>:first-child,.swal2-container.swal2-bottom-start>:first-child,.swal2-container.swal2-bottom>:first-child{margin-top:auto}.swal2-container.swal2-grow-fullscreen>.swal2-modal{display:flex!important;flex:1;align-self:stretch;justify-content:center}.swal2-container.swal2-grow-row>.swal2-modal{display:flex!important;flex:1;align-content:center;justify-content:center}.swal2-container.swal2-grow-column{flex:1;flex-direction:column}.swal2-container.swal2-grow-column.swal2-bottom,.swal2-container.swal2-grow-column.swal2-center,.swal2-container.swal2-grow-column.swal2-top{align-items:center}.swal2-container.swal2-grow-column.swal2-bottom-left,.swal2-container.swal2-grow-column.swal2-bottom-start,.swal2-container.swal2-grow-column.swal2-center-left,.swal2-container.swal2-grow-column.swal2-center-start,.swal2-container.swal2-grow-column.swal2-top-left,.swal2-container.swal2-grow-column.swal2-top-start{align-items:flex-start}.swal2-container.swal2-grow-column.swal2-bottom-end,.swal2-container.swal2-grow-column.swal2-bottom-right,.swal2-container.swal2-grow-column.swal2-center-end,.swal2-container.swal2-grow-column.swal2-center-right,.swal2-container.swal2-grow-column.swal2-top-end,.swal2-container.swal2-grow-column.swal2-top-right{align-items:flex-end}.swal2-container.swal2-grow-column>.swal2-modal{display:flex!important;flex:1;align-content:center;justify-content:center}.swal2-container.swal2-no-transition{transition:none!important}.swal2-container:not(.swal2-top):not(.swal2-top-start):not(.swal2-top-end):not(.swal2-top-left):not(.swal2-top-right):not(.swal2-center-start):not(.swal2-center-end):not(.swal2-center-left):not(.swal2-center-right):not(.swal2-bottom):not(.swal2-bottom-start):not(.swal2-bottom-end):not(.swal2-bottom-left):not(.swal2-bottom-right):not(.swal2-grow-fullscreen)>.swal2-modal{margin:auto}@media all and (-ms-high-contrast:none),(-ms-high-contrast:active){.swal2-container .swal2-modal{margin:0!important}}.swal2-popup{display:none;position:relative;box-sizing:border-box;flex-direction:column;justify-content:center;width:32em;max-width:100%;padding:1.25em;border:none;border-radius:5px;background:#fff;font-family:inherit;font-size:1rem}.swal2-popup:focus{outline:0}.swal2-popup.swal2-loading{overflow-y:hidden}.swal2-header{display:flex;flex-direction:column;align-items:center;padding:0 1.8em}.swal2-title{position:relative;max-width:100%;margin:0 0 .4em;padding:0;color:#595959;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;word-wrap:break-word}.swal2-actions{display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:center;width:100%;margin:1.25em auto 0;padding:0}.swal2-actions:not(.swal2-loading) .swal2-styled[disabled]{opacity:.4}.swal2-actions:not(.swal2-loading) .swal2-styled:hover{background-image:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.1))}.swal2-actions:not(.swal2-loading) .swal2-styled:active{background-image:linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.2))}.swal2-loader{display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;-webkit-animation:swal2-rotate-loading 1.5s linear 0s infinite normal;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 transparent #2778c4 transparent}.swal2-styled{margin:.3125em;padding:.625em 1.1em;box-shadow:none;font-weight:500}.swal2-styled:not([disabled]){cursor:pointer}.swal2-styled.swal2-confirm{border:0;border-radius:.25em;background:initial;background-color:#2778c4;color:#fff;font-size:1em}.swal2-styled.swal2-deny{border:0;border-radius:.25em;background:initial;background-color:#d14529;color:#fff;font-size:1em}.swal2-styled.swal2-cancel{border:0;border-radius:.25em;background:initial;background-color:#757575;color:#fff;font-size:1em}.swal2-styled:focus{outline:0;box-shadow:0 0 0 3px rgba(100,150,200,.5)}.swal2-styled::-moz-focus-inner{border:0}.swal2-footer{justify-content:center;margin:1.25em 0 0;padding:1em 0 0;border-top:1px solid #eee;color:#545454;font-size:1em}.swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;height:.25em;overflow:hidden;border-bottom-right-radius:5px;border-bottom-left-radius:5px}.swal2-timer-progress-bar{width:100%;height:.25em;background:rgba(0,0,0,.2)}.swal2-image{max-width:100%;margin:1.25em auto}.swal2-close{position:absolute;z-index:2;top:0;right:0;align-items:center;justify-content:center;width:1.2em;height:1.2em;padding:0;overflow:hidden;transition:color .1s ease-out;border:none;border-radius:5px;background:0 0;color:#ccc;font-family:serif;font-size:2.5em;line-height:1.2;cursor:pointer}.swal2-close:hover{transform:none;background:0 0;color:#f27474}.swal2-close:focus{outline:0;box-shadow:inset 0 0 0 3px rgba(100,150,200,.5)}.swal2-close::-moz-focus-inner{border:0}.swal2-content{z-index:1;justify-content:center;margin:0;padding:0 1.6em;color:#545454;font-size:1.125em;font-weight:400;line-height:normal;text-align:center;word-wrap:break-word}.swal2-checkbox,.swal2-file,.swal2-input,.swal2-radio,.swal2-select,.swal2-textarea{margin:1em auto}.swal2-file,.swal2-input,.swal2-textarea{box-sizing:border-box;width:100%;transition:border-color .3s,box-shadow .3s;border:1px solid #d9d9d9;border-radius:.1875em;background:inherit;box-shadow:inset 0 1px 1px rgba(0,0,0,.06);color:inherit;font-size:1.125em}.swal2-file.swal2-inputerror,.swal2-input.swal2-inputerror,.swal2-textarea.swal2-inputerror{border-color:#f27474!important;box-shadow:0 0 2px #f27474!important}.swal2-file:focus,.swal2-input:focus,.swal2-textarea:focus{border:1px solid #b4dbed;outline:0;box-shadow:0 0 0 3px rgba(100,150,200,.5)}.swal2-file::-moz-placeholder,.swal2-input::-moz-placeholder,.swal2-textarea::-moz-placeholder{color:#ccc}.swal2-file:-ms-input-placeholder,.swal2-input:-ms-input-placeholder,.swal2-textarea:-ms-input-placeholder{color:#ccc}.swal2-file::placeholder,.swal2-input::placeholder,.swal2-textarea::placeholder{color:#ccc}.swal2-range{margin:1em auto;background:#fff}.swal2-range input{width:80%}.swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}.swal2-range input,.swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}.swal2-input{height:2.625em;padding:0 .75em}.swal2-input[type=number]{max-width:10em}.swal2-file{background:inherit;font-size:1.125em}.swal2-textarea{height:6.75em;padding:.75em}.swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:inherit;color:inherit;font-size:1.125em}.swal2-checkbox,.swal2-radio{align-items:center;justify-content:center;background:#fff;color:inherit}.swal2-checkbox label,.swal2-radio label{margin:0 .6em;font-size:1.125em}.swal2-checkbox input,.swal2-radio input{flex-shrink:0;margin:0 .4em}.swal2-input-label{display:flex;justify-content:center;margin:1em auto}.swal2-validation-message{align-items:center;justify-content:center;margin:0 -2.7em;padding:.625em;overflow:hidden;background:#f0f0f0;color:#666;font-size:1em;font-weight:300}.swal2-validation-message::before{content:"!";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}.swal2-icon{position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:1.25em auto 1.875em;border:.25em solid transparent;border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}.swal2-icon.swal2-error{border-color:#f27474;color:#f27474}.swal2-icon.swal2-error .swal2-x-mark{position:relative;flex-grow:1}.swal2-icon.swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}.swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}.swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}.swal2-icon.swal2-error.swal2-icon-show{-webkit-animation:swal2-animate-error-icon .5s;animation:swal2-animate-error-icon .5s}.swal2-icon.swal2-error.swal2-icon-show .swal2-x-mark{-webkit-animation:swal2-animate-error-x-mark .5s;animation:swal2-animate-error-x-mark .5s}.swal2-icon.swal2-warning{border-color:#facea8;color:#f8bb86}.swal2-icon.swal2-info{border-color:#9de0f6;color:#3fc3ee}.swal2-icon.swal2-question{border-color:#c9dae1;color:#87adbd}.swal2-icon.swal2-success{border-color:#a5dc86;color:#a5dc86}.swal2-icon.swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;transform:rotate(45deg);border-radius:50%}.swal2-icon.swal2-success [class^=swal2-success-circular-line][class$=left]{top:-.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}.swal2-icon.swal2-success [class^=swal2-success-circular-line][class$=right]{top:-.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}.swal2-icon.swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-.25em;left:-.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}.swal2-icon.swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}.swal2-icon.swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}.swal2-icon.swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}.swal2-icon.swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-line-tip{-webkit-animation:swal2-animate-success-line-tip .75s;animation:swal2-animate-success-line-tip .75s}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-line-long{-webkit-animation:swal2-animate-success-line-long .75s;animation:swal2-animate-success-line-long .75s}.swal2-icon.swal2-success.swal2-icon-show .swal2-success-circular-line-right{-webkit-animation:swal2-rotate-success-circular-line 4.25s ease-in;animation:swal2-rotate-success-circular-line 4.25s ease-in}.swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:0 0 1.25em;padding:0;background:inherit;font-weight:600}.swal2-progress-steps li{display:inline-block;position:relative}.swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:#add8e6;color:#fff}.swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:#add8e6}.swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}[class^=swal2]{-webkit-tap-highlight-color:transparent}.swal2-show{-webkit-animation:swal2-show .3s;animation:swal2-show .3s}.swal2-hide{-webkit-animation:swal2-hide .15s forwards;animation:swal2-hide .15s forwards}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{right:auto;left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}@supports (-ms-accelerator:true){.swal2-range input{width:100%!important}.swal2-range output{display:none}}@media all and (-ms-high-contrast:none),(-ms-high-contrast:active){.swal2-range input{width:100%!important}.swal2-range output{display:none}}@-webkit-keyframes swal2-toast-show{0%{transform:translateY(-.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0)}}@keyframes swal2-toast-show{0%{transform:translateY(-.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0)}}@-webkit-keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@-webkit-keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@-webkit-keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}@-webkit-keyframes swal2-show{0%{transform:scale(.7)}45%{transform:scale(1.05)}80%{transform:scale(.95)}100%{transform:scale(1)}}@keyframes swal2-show{0%{transform:scale(.7)}45%{transform:scale(1.05)}80%{transform:scale(.95)}100%{transform:scale(1)}}@-webkit-keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(.5);opacity:0}}@keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(.5);opacity:0}}@-webkit-keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@-webkit-keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@-webkit-keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@-webkit-keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(.4);opacity:0}50%{margin-top:1.625em;transform:scale(.4);opacity:0}80%{margin-top:-.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(.4);opacity:0}50%{margin-top:1.625em;transform:scale(.4);opacity:0}80%{margin-top:-.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@-webkit-keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0);opacity:1}}@-webkit-keyframes swal2-rotate-loading{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes swal2-rotate-loading{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto!important}body.swal2-no-backdrop .swal2-container{top:auto;right:auto;bottom:auto;left:auto;max-width:calc(100% - .625em * 2);background-color:transparent!important}body.swal2-no-backdrop .swal2-container>.swal2-modal{box-shadow:0 0 10px rgba(0,0,0,.4)}body.swal2-no-backdrop .swal2-container.swal2-top{top:0;left:50%;transform:translateX(-50%)}body.swal2-no-backdrop .swal2-container.swal2-top-left,body.swal2-no-backdrop .swal2-container.swal2-top-start{top:0;left:0}body.swal2-no-backdrop .swal2-container.swal2-top-end,body.swal2-no-backdrop .swal2-container.swal2-top-right{top:0;right:0}body.swal2-no-backdrop .swal2-container.swal2-center{top:50%;left:50%;transform:translate(-50%,-50%)}body.swal2-no-backdrop .swal2-container.swal2-center-left,body.swal2-no-backdrop .swal2-container.swal2-center-start{top:50%;left:0;transform:translateY(-50%)}body.swal2-no-backdrop .swal2-container.swal2-center-end,body.swal2-no-backdrop .swal2-container.swal2-center-right{top:50%;right:0;transform:translateY(-50%)}body.swal2-no-backdrop .swal2-container.swal2-bottom{bottom:0;left:50%;transform:translateX(-50%)}body.swal2-no-backdrop .swal2-container.swal2-bottom-left,body.swal2-no-backdrop .swal2-container.swal2-bottom-start{bottom:0;left:0}body.swal2-no-backdrop .swal2-container.swal2-bottom-end,body.swal2-no-backdrop .swal2-container.swal2-bottom-right{right:0;bottom:0}@media print{body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow-y:scroll!important}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) .swal2-container{position:static!important}}body.swal2-toast-shown .swal2-container{background-color:transparent}body.swal2-toast-shown .swal2-container.swal2-top{top:0;right:auto;bottom:auto;left:50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{top:0;right:0;bottom:auto;left:auto}body.swal2-toast-shown .swal2-container.swal2-top-left,body.swal2-toast-shown .swal2-container.swal2-top-start{top:0;right:auto;bottom:auto;left:0}body.swal2-toast-shown .swal2-container.swal2-center-left,body.swal2-toast-shown .swal2-container.swal2-center-start{top:50%;right:auto;bottom:auto;left:0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{top:50%;right:auto;bottom:auto;left:50%;transform:translate(-50%,-50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{top:50%;right:0;bottom:auto;left:auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-left,body.swal2-toast-shown .swal2-container.swal2-bottom-start{top:auto;right:auto;bottom:0;left:0}body.swal2-toast-shown .swal2-container.swal2-bottom{top:auto;right:auto;bottom:0;left:50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{top:auto;right:0;bottom:0;left:auto}</style>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/popper.js"></script>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/popper_002.js"></script>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/bootstrap_002.js"></script>
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/bootstrap.js"></script>
+
+    <title>Make I Roni | Crunch &amp; Tasty</title>
+</head>
+
+<body>
+    <!-- DEBUG-VIEW START 1 APPPATH\Views\layout\navbar.php -->
+<div id="appLogin"><nav class="navbar navbar-expand-lg navbar-light bg-rich-black bg-dark"><div class="container"><p id="phone-number"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-telephone"><path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"></path></svg> +62 821-6854-0447</p> <p id="response-text">Fast Response : 08.00 - 12.00 WIB</p> <a href="mailto:makeironi@gmail.com" target="_blank" id="email" class="nav-link text-light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-envelope"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.758 2.855L15 11.114v-5.73zm-.034 6.878L9.271 8.82 8 9.583 6.728 8.82l-5.694 3.44A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.739zM1 11.114l4.758-2.876L1 5.383v5.73z"></path></svg> makeironie@gmail.com</a></div></nav> <nav class="navbar navbar-expand-lg navbar-light bg-grullo p-4"><div class="container"><a href="http://localhost:8080/" class="navbar-brand"><img src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/logo_only.png" class="logo" width="50" height="50">Make I Roni</a> <button type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler order-first"><span class="navbar-toggler-icon"></span></button> <div id="navbarSupportedContent" class="collapse navbar-collapse"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a aria-current="page" href="http://localhost:8080/" class="nav-link">Home</a></li> <li class="nav-item"><a href="https://api.whatsapp.com/send?phone=62821-6854-0447&amp;text=Halo%20kak%20!%20aku%20pengen%20dong%20makaroni%20make%20i%20roni%20nya%20kayaknya%20keliatan%20tasty%20banget%20nih%20:D" class="nav-link">Kontak</a></li> <li class="nav-item"><a href="http://localhost:8080/user/about" class="nav-link">Tentang</a></li></ul> <div class="dropdown"><button type="button" id="menu1" data-toggle="dropdown" class="btn btn-default dropdown-toggle"><img src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/user-512.png" class="img-fluid profile_image"> <span class="caret"></span></button> <ul role="menu" aria-labelledby="menu1" class="dropdown-menu p-2 mt-2"><li class="cart-desktop "><a href="http://localhost:8080/user/cart/view" class="btn green-custom ml-3 w-100 text-light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-cart"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"></path></svg> Cart <span class="badge text-light">1</span></a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="http://localhost:8080/user/order/complete" class="nav-link">Status Pemesanan</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">Keluar</a></li></ul></div></div> <ul class="navbar-nav ml-auto cart-mobile"><li><a href="http://localhost:8080/user/cart/view" class="btn green-custom text-light ml-3 w-100">Cart <span class="badge text-light">1</span></a></li></ul></div> <div id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" class="modal fade loginModal"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 id="loginModalLabel" class="modal-title">Login</h5> <button type="button" data-dismiss="modal" aria-label="Close" class="close btn btn-secondary"><span aria-hidden="true">×</span></button></div> <div class="modal-body"><!----> <input type=" text" placeholder="Email" required="required" autofocus="autofocus" class="form-control"> <input placeholder="Password" type="password" class="form-control mt-3 mb-3"> <button class="btn green-custom text-light w-100">Login</button> <div class="text-center"><p class="mt-3">Atau</p> <button class="btn btn-light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-google"><path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"></path></svg> Masuk dengan Google</button></div> <div class="text-center mt-3"><p>Belum punya akun ? <a href="#" data-toggle="modal" data-target="#registerModal" data-dismiss="modal" class="login-register-btn">Daftar</a></p></div></div></div></div></div> <div id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true" class="modal fade"><div class="modal-dialog modal-dialog-centered"><div class="container"><div class="modal-content"><div class="modal-header"><h5 id="registerModalLabel" class="modal-title">Registrasi</h5> <button type="button" data-dismiss="modal" aria-label="Close" class="close btn btn-secondary"><span aria-hidden="true">×</span></button></div> <div class="modal-body"><!----> <input type=" email" placeholder="Email" class="form-control"> <input type="password" placeholder="Password" class="form-control mt-3 mb-3"> <input type=" text" placeholder="Nama" class="form-control mt-3 mb-3"> <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3"> <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3"> <input type="text" placeholder="Tanggal Lahir" onfocus="(this.type='date')" class="form-control mt-3 mb-3"> <p>Jenis Kelamin : </p> <div class="d-flex p-2"><div class="form-check"><input type="radio" name="gender" id="rbMale" class="form-check-input" value="L"> <label for="radiobutton1" class="form-check-label"> Laki-Laki </label></div> <div class="form-check gender"><input type="radio" name="gender" id="rbFemail" class="form-check-input ml-2" value="P"> <label for="exampleRadios2" class="form-check-label"> Perempuan </label></div></div> <button class="btn green-custom text-light w-100 mt-2 mb-2">Register</button> <div class="text-center mt-3"><a href="#"></a> <p>Sudah punya akun ? <a href="#" data-toggle="modal" data-target="#loginModal" data-dismiss="modal" class="login-register-btn">Login</a></p></div></div></div></div></div></div></nav></div>
+
+
+
+
+<script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/user.js"></script>
+<!-- DEBUG-VIEW ENDED 1 APPPATH\Views\layout\navbar.php -->
+    
+<div id="app"><div class="container mt-5 mb-5"><div class="shopping-cart-desktop"><div class="row mt-5"><div class="title text-center"><h4 class="font-weigth-bold">SHOPPING CART <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16" class="bi bi-caret-right"><path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"></path></svg> <span class="text-muted">METODE PEMBAYARAN </span> <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16" class="bi bi-caret-right"><path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"></path></svg> <span class="text-muted">ORDER COMPLETE</span></h4></div> <div class="text-muted text-center mt-5 mb-5"><img src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/sad-512.png" alt="" width="200"> <h3>Keranjang Kosong Masih Kosong</h3></div></div> <div class="row"><div class="col-md-6"><a href="http://localhost:8080/" class="btn btn-outline-dark"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-left-short"><path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"></path></svg>Lanjut Belanja</a></div> <!----></div></div></div> <div class="shopping-cart-mobile"><div class="container"><a href="http://localhost:8080/" class="btn mb-3 btn-outline-dark"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-left-short"><path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"></path></svg> Lanjut Belanja</a> <h2 class="title-cart">Shopping Cart</h2> <p class="text-muted">0 Jenis Makaroni</p> <hr> <div class="scrolling-wrapper"></div> <hr> <p>Jumlah Produk : 0 Jenis Makaroni</p> <p>Total Harga : Rp. 10000</p> <a href="#" class="btn green-custom text-light w-100 mt-1">PROCESS TO CHECKOUT</a> <a href="#" class="btn btn-outline-dark text-dark w-100 mt-3">UPDATE CART</a></div></div></div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/cart.js"></script>
+
+    <!-- DEBUG-VIEW START 2 APPPATH\Views\layout\footer.php -->
+    <div class="footer">
+        <div class="card footer-1 rounded-0 footer-mobile">
+            <div class="container">
+                <h1 class="h1">Hubungi Kami Melalui</h1>
+                <p class="mt-3"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                        <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"></path>
+                    </svg> +62 821-6854-0447</p>
+                <p><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                        <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.758 2.855L15 11.114v-5.73zm-.034 6.878L9.271 8.82 8 9.583 6.728 8.82l-5.694 3.44A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.739zM1 11.114l4.758-2.876L1 5.383v5.73z"></path>
+                    </svg> makeironie@gmail.com</p>
+            </div>
+        </div>
+
+        <div class="card bg-dark rounded-0 copyright">
+            <div class="container text-light pt-3">
+                <p class="footer-mobile">Copyright © MakeIroni 2021. All Right Reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var url = 'https://wati-integration-service.clare.ai/ShopifyWidget/shopifyWidget.js?20877';
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        s.src = url;
+        var options = {
+            "enabled": true,
+            "chatButtonSetting": {
+                "backgroundColor": "#4dc247",
+                "ctaText": "",
+                "borderRadius": "25",
+                "marginLeft": "0",
+                "marginBottom": "50",
+                "marginRight": "50",
+                "position": "right"
+            },
+            "brandSetting": {
+                "brandName": "Make I Roni",
+                "brandSubTitle": "Lokal Lestari",
+                "brandImg": "/img/logo_only.png",
+                "welcomeText": "Halo ! \nMau Pesan Makaroni Rasa Apa ?",
+                "messageText": "Halo kak ! aku pengen dong makaroni make i roni nya kayaknya keliatan tasty banget nih :D",
+                "backgroundColor": "#0a5f54",
+                "ctaText": "Start Chat",
+                "borderRadius": "25",
+                "autoShow": false,
+                "phoneNumber": "62821-6854-0447"
+            }
+        };
+        s.onload = function() {
+            CreateWhatsappChatWidget(options);
+        };
+        var x = document.getElementsByTagName('script')[0];
+        x.parentNode.insertBefore(s, x);
+    </script>
+
+    <script src="Make%20I%20Roni%20Crunch%20&amp;%20Tasty_files/user.json"></script>
+<!-- DEBUG-VIEW ENDED 2 APPPATH\Views\layout\footer.php -->
+
+
+
+
+
+
+<div id="toolbarContainer">
+<div id="debug-icon" class="debug-bar-ndisplay" style="display: inline-block;">
+	<a id="debug-icon-link" href="javascript:void(0)">
+		<svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 155 200"><defs></defs><path fill="#dd4814" d="M73.7 3.7c2.2 7.9-.7 18.5-7.8 29-1.8 2.6-10.7 12.2-19.7 21.3-23.9 24-33.6 37.1-40.3 54.4-7.9 20.6-7.8 40.8.5 58.2C12.8 180 27.6 193 42.5 198l6 2-3-2.2c-21-15.2-22.9-38.7-4.8-58.8 2.5-2.7 4.8-5 5.1-5 .4 0 .7 2.7.7 6.1 0 5.7.2 6.2 3.7 9.5 3 2.7 4.6 3.4 7.8 3.4 5.6 0 9.9-2.4 11.6-6.5 2.9-6.9 1.6-12-5-20.5-10.5-13.4-11.7-23.3-4.3-34.7l3.1-4.8.7 4.7c1.3 8.2 5.8 12.9 25 25.8 20.9 14.1 30.6 26.1 32.8 40.5 1.1 7.2-.1 16.1-3.1 21.8-2.7 5.3-11.2 14.3-16.5 17.4-2.4 1.4-4.3 2.6-4.3 2.8 0 .2 2.4-.4 5.3-1.4 24.1-8.3 42.7-27.1 48.2-48.6 1.9-7.6 1.9-20.2-.1-28.5-3.5-15.2-14.6-30.5-29.9-41.2l-7-4.9-.6 3.3c-.8 4.8-2.6 7.6-5.9 9.3-4.5 2.3-10.3 1.9-13.8-1-6.7-5.7-7.8-14.6-3.7-30.5 3-11.6 3.2-20.6.5-29.1C88.3 18 80.6 6.3 74.8 2.2 73.1.9 73 1 73.7 3.7z"></path></svg>
+	</a>
+</div>
+<div id="debug-bar" style="display: none;">
+	<div class="toolbar">
+		<span id="toolbar-position"><a href="javascript: void(0)">↕</a></span>
+		<span id="toolbar-theme"><a href="javascript: void(0)">🔅</a></span>
+		<span class="ci-label">
+			<a href="javascript: void(0)" data-tab="ci-timeline">
+				<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD7SURBVEhLY6ArSEtLK09NTbWHcvGC9PR0BaDaQiAdUl9fzwQVxg+AFvwHamqHcnGCpKQkeaDa9yD1UD09UCn8AKaBWJySkmIApFehi0ONwwRQBceBLurAh4FqFoHUAtkrgPgREN+ByYEw1DhMANVEMIhAYQ5U1wtU/wmILwLZRlAp/IBYC8gGw88CaFj3A/FnIL4ETDXGUCnyANSC/UC6HIpnQMXAqQXIvo0khxNDjcMEQEmU9AzDuNI7Lgw1DhOAJIEuhQcRKMcC+e+QNHdDpcgD6BaAANSSQqBcENFlDi6AzQKqgkFlwWhxjVI8o2OgmkFaXI8CTMDAAAAxd1O4FzLMaAAAAABJRU5ErkJggg==">
+				<span class="hide-sm">52.3 ms &nbsp; 4.703 MB</span>
+			</a>
+		</span>
+
+														<span class="ci-label">
+					<a href="javascript: void(0)" data-tab="ci-database">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADMSURBVEhLY6A3YExLSwsA4nIycQDIDIhRWEBqamo/UNF/SjDQjF6ocZgAKPkRiFeEhoYyQ4WIBiA9QAuWAPEHqBAmgLqgHcolGQD1V4DMgHIxwbCxYD+QBqcKINseKo6eWrBioPrtQBq/BcgY5ht0cUIYbBg2AJKkRxCNWkDQgtFUNJwtABr+F6igE8olGQD114HMgHIxAVDyAhA/AlpSA8RYUwoeXAPVex5qHCbIyMgwBCkAuQJIY00huDBUz/mUlBQDqHGjgBjAwAAACexpph6oHSQAAAAASUVORK5CYII=">
+						<span class="hide-sm">
+							Database															<span class="badge">1</span>
+													</span>
+					</a>
+				</span>
+																	<span class="ci-label">
+					<a href="javascript: void(0)" data-tab="ci-views">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADeSURBVEhL7ZSxDcIwEEWNYA0YgGmgyAaJLTcUaaBzQQEVjMEabBQxAdw53zTHiThEovGTfnE/9rsoRUxhKLOmaa6Uh7X2+UvguLCzVxN1XW9x4EYHzik033Hp3X0LO+DaQG8MDQcuq6qao4qkHuMgQggLvkPLjqh00ZgFDBacMJYFkuwFlH1mshdkZ5JPJERA9JpI6xNCBESvibQ+IURA9JpI6xNCBESvibQ+IURA9DTsuHTOrVFFxixgB/eUFlU8uKJ0eDBFOu/9EvoeKnlJS2/08Tc8NOwQ8sIfMeYFjqKDjdU2sp4AAAAASUVORK5CYII=">
+						<span class="hide-sm">
+							Views															<span class="badge">0</span>
+													</span>
+					</a>
+				</span>
+												<span class="ci-label">
+					<a href="javascript: void(0)" data-tab="ci-files">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGBSURBVEhL7ZQ9S8NQGIVTBQUncfMfCO4uLgoKbuKQOWg+OkXERRE1IAXrIHbVDrqIDuLiJgj+gro7S3dnpfq88b1FMTE3VZx64HBzzvvZWxKnj15QCcPwCD5HUfSWR+JtzgmtsUcQBEva5IIm9SwSu+95CAWbUuy67qBa32ByZEDpIaZYZSZMjjQuPcQUq8yEyYEb8FSerYeQVGbAFzJkX1PyQWLhgCz0BxTCekC1Wp0hsa6yokzhed4oje6Iz6rlJEkyIKfUEFtITVtQdAibn5rMyaYsMS+a5wTv8qeXMhcU16QZbKgl3hbs+L4/pnpdc87MElZgq10p5DxGdq8I7xrvUWUKvG3NbSK7ubngYzdJwSsF7TiOh9VOgfcEz1UayNe3JUPM1RWC5GXYgTfc75B4NBmXJnAtTfpABX0iPvEd9ezALwkplCFXcr9styiNOKc1RRZpaPM9tcqBwlWzGY1qPL9wjqRBgF5BH6j8HWh2S7MHlX8PrmbK+k/8PzjOOzx1D3i1pKTTAAAAAElFTkSuQmCC">
+						<span class="hide-sm">
+							Files															<span class="badge">120</span>
+													</span>
+					</a>
+				</span>
+												<span class="ci-label">
+					<a href="javascript: void(0)" data-tab="ci-routes">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFDSURBVEhL7ZRNSsNQFIUjVXSiOFEcuQIHDpzpxC0IGYeE/BEInbWlCHEDLsSiuANdhKDjgm6ggtSJ+l25ldrmmTwIgtgDh/t37r1J+16cX0dRFMtpmu5pWAkrvYjjOB7AETzStBFW+inxu3KUJMmhludQpoflS1zXban4LYqiO224h6VLTHr8Z+z8EpIHFF9gG78nDVmW7UgTHKjsCyY98QP+pcq+g8Ku2s8G8X3f3/I8b038WZTp+bO38zxfFd+I6YY6sNUvFlSDk9CRhiAI1jX1I9Cfw7GG1UB8LAuwbU0ZwQnbRDeEN5qqBxZMLtE1ti9LtbREnMIuOXnyIf5rGIb7Wq8HmlZgwYBH7ORTcKH5E4mpjeGt9fBZcHE2GCQ3Vt7oTNPNg+FXLHnSsHkw/FR+Gg2bB8Ptzrst/v6C/wrH+QB+duli6MYJdQAAAABJRU5ErkJggg==">
+						<span class="hide-sm">
+							Routes															<span class="badge">25</span>
+													</span>
+					</a>
+				</span>
+												<span class="ci-label">
+					<a href="javascript: void(0)" data-tab="ci-events">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEASURBVEhL7ZXNDcIwDIVTsRBH1uDQDdquUA6IM1xgCA6MwJUN2hk6AQzAz0vl0ETUxC5VT3zSU5w81/mRMGZysixbFEVR0jSKNt8geQU9aRpFmp/keX6AbjZ5oB74vsaN5lSzA4tLSjpBFxsjeSuRy4d2mDdQTWU7YLbXTNN05mKyovj5KL6B7q3hoy3KwdZxBlT+Ipz+jPHrBqOIynZgcZonoukb/0ckiTHqNvDXtXEAaygRbaB9FvUTjRUHsIYS0QaSp+Dw6wT4hiTmYHOcYZsdLQ2CbXa4ftuuYR4x9vYZgdb4vsFYUdmABMYeukK9/SUme3KMFQ77+Yfzh8eYF8+orDuDWU5LAAAAAElFTkSuQmCC">
+						<span class="hide-sm">
+							Events															<span class="badge">2</span>
+													</span>
+					</a>
+				</span>
+												<span class="ci-label">
+					<a href="javascript: void(0)" data-tab="ci-history">
+						<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJySURBVEhL3ZU7aJNhGIVTpV6i4qCIgkIHxcXLErS4FBwUFNwiCKGhuTYJGaIgnRoo4qRu6iCiiIuIXXTTIkIpuqoFwaGgonUQlC5KafU5ycmNP0lTdPLA4fu+8573/a4/f6hXpFKpwUwmc9fDfweKbk+n07fgEv33TLSbtt/hvwNFT1PsG/zdTE0Gp+GFfD6/2fbVIxqNrqPIRbjg4t/hY8aztcngfDabHXbKyiiXy2vcrcPH8oDCry2FKDrA+Ar6L01E/ypyXzXaARjDGGcoeNxSDZXE0dHRA5VRE5LJ5CFy5jzJuOX2wHRHRnjbklZ6isQ3tIctBaAd4vlK3jLtkOVWqABBXd47jGHLmjTmSScttQV5J+SjfcUweFQEbsjAas5aqoCLXutJl7vtQsAzpRowYqkBinyCC8Vicb2lOih8zoldd0F8RD7qTFiqAnGrAy8stUAvi/hbqDM+YzkAFrLPdR5ZqoLXsd+Bh5YCIH7JniVdquUWxOPxDfboHhrI5XJ7HHhiqQXox+APe/Qk64+gGYVCYZs8cMpSFQj9JOoFzVqqo7k4HIvFYpscCoAjOmLffUsNUGRaQUwDlmofUa34ecsdgXdcXo4wbakBgiUFafXJV8A4DJ/2UrxUKm3E95H8RbjLcgOJRGILhnmCP+FBy5XvwN2uIPcy1AJvWgqC4xm2aU4Xb3lF4I+Tpyf8hRe5w3J7YLymSeA8Z3nSclv4WLRyFdfOjzrUFX0klJUEtZtntCNc+F69cz/FiDzEPtjzmcUMOr83kDQEX6pAJxJfpL3OX22n01YN7SZCoQnaSdoZ+Jz+PZihH3wt/xlCoT9M6nEtmRSPCQAAAABJRU5ErkJggg==">
+						<span class="hide-sm">
+							History															<span class="badge">20</span>
+													</span>
+					</a>
+				</span>
+					
+		<span class="ci-label">
+			<a href="javascript: void(0)" data-tab="ci-vars">
+				<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACLSURBVEhLYxgFJIHU1NSraWlp/6H4T0pKSjRUijoAyXAwBlrYDpViAFpmARQrJwZDtWACoCROC4D8CnR5XBiqBRMADfyNprgRKkUdAApzoCUdUNwE5MtApYYIALp6NBWBMVQLJgAaOJqK8AOgq+mSio6DggjEBtLUT0UwQ5HZIADkj6aiUTAggIEBANAEDa/lkCRlAAAAAElFTkSuQmCC">
+				<span class="hide-sm">Vars</span>
+			</a>
+		</span>
+
+		<h1>
+			<span class="ci-label">
+				<a href="javascript: void(0)" data-tab="ci-config">
+					<svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 155 200"><defs></defs><path fill="#dd4814" d="M73.7 3.7c2.2 7.9-.7 18.5-7.8 29-1.8 2.6-10.7 12.2-19.7 21.3-23.9 24-33.6 37.1-40.3 54.4-7.9 20.6-7.8 40.8.5 58.2C12.8 180 27.6 193 42.5 198l6 2-3-2.2c-21-15.2-22.9-38.7-4.8-58.8 2.5-2.7 4.8-5 5.1-5 .4 0 .7 2.7.7 6.1 0 5.7.2 6.2 3.7 9.5 3 2.7 4.6 3.4 7.8 3.4 5.6 0 9.9-2.4 11.6-6.5 2.9-6.9 1.6-12-5-20.5-10.5-13.4-11.7-23.3-4.3-34.7l3.1-4.8.7 4.7c1.3 8.2 5.8 12.9 25 25.8 20.9 14.1 30.6 26.1 32.8 40.5 1.1 7.2-.1 16.1-3.1 21.8-2.7 5.3-11.2 14.3-16.5 17.4-2.4 1.4-4.3 2.6-4.3 2.8 0 .2 2.4-.4 5.3-1.4 24.1-8.3 42.7-27.1 48.2-48.6 1.9-7.6 1.9-20.2-.1-28.5-3.5-15.2-14.6-30.5-29.9-41.2l-7-4.9-.6 3.3c-.8 4.8-2.6 7.6-5.9 9.3-4.5 2.3-10.3 1.9-13.8-1-6.7-5.7-7.8-14.6-3.7-30.5 3-11.6 3.2-20.6.5-29.1C88.3 18 80.6 6.3 74.8 2.2 73.1.9 73 1 73.7 3.7z"></path></svg>
+					4.1.1				</a>
+			</span>
+		</h1>
+
+		<!-- Open/Close Toggle -->
+		<a id="debug-bar-link" href="javascript:void(0)" title="Open/Close">
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEPSURBVEhL7ZVLDoJAEEThRuoGDwSEG+jCuFU34s3AK3APP1VDDSGMqI1xx0s6M/2rnlHEaMZElmWrPM+vsDvsYbQ7+us0TReSC2EBrEHxCevRYuppYLXkQpC8sVCuGfTvqSE3hFdFwUGuGfRvqSE35NUAfKZrbQNQm2jrMA+gOK+M+FmhDsRL5voHMA8gFGecq0JOXLWlQg7E7AMIxZnjOiZOEJ82gFCcedUE4gS56QP8yf8ywItz7e+RituKlkkDBoIOH4Nd4HZD4NsGYJ/Abn1xEVOcuZ8f0zc/tHiYmzTAwscBvDIK/veyQ9K/rnewjdF26q0kF1IUxZIFPAVW98x/a+qp8L2M/+HMhETRE6S8TxpZ7KGXAAAAAElFTkSuQmCC">
+		</a>
+	</div>
+
+	<!-- Timeline -->
+	<div id="ci-timeline" class="tab">
+		<table class="timeline">
+			<thead>
+			<tr>
+				<th class="debug-bar-width30">NAME</th>
+				<th class="debug-bar-width10">COMPONENT</th>
+				<th class="debug-bar-width10">DURATION</th>
+									<th>0 ms</th>
+									<th>10 ms</th>
+									<th>20 ms</th>
+									<th>30 ms</th>
+									<th>40 ms</th>
+									<th>50 ms</th>
+							</tr>
+			</thead>
+			<tbody>
+			<tr><td>Bootstrap</td><td>Timer</td><td class="debug-bar-alignRight">13.32 ms</td><td class="debug-bar-noverflow" colspan="6"><span class="timer debug-bar-timeline-0" title="22.19%"></span></td></tr><tr><td>Routing</td><td>Timer</td><td class="debug-bar-alignRight">1.81 ms</td><td class="debug-bar-noverflow" colspan="6"><span class="timer debug-bar-timeline-1" title="3.02%"></span></td></tr><tr><td>Controller</td><td>Timer</td><td class="debug-bar-alignRight">35.42 ms</td><td class="debug-bar-noverflow" colspan="6"><span class="timer debug-bar-timeline-2" title="59.04%"></span></td></tr><tr><td>Controller Constructor</td><td>Timer</td><td class="debug-bar-alignRight">8.47 ms</td><td class="debug-bar-noverflow" colspan="6"><span class="timer debug-bar-timeline-3" title="14.12%"></span></td></tr><tr><td>Query</td><td>Database</td><td class="debug-bar-alignRight">0.37 ms</td><td class="debug-bar-noverflow" colspan="6"><span class="timer debug-bar-timeline-4" title="0.62%"></span></td></tr>			</tbody>
+		</table>
+	</div>
+
+	<!-- Collector-provided Tabs -->
+																		<div id="ci-database" class="tab">
+					<h2>Database <span>(1 Queries across 0 Connection)</span></h2>
+
+					<table>
+    <thead>
+        <tr>
+            <th class="debug-bar-width6r">Time</th>
+            <th>Query String</th>
+        </tr>
+    </thead>
+    <tbody>
+    
+        <tr>
+            <td class="narrow">0.37 ms</td>
+            <td><strong>SELECT</strong> *, `cart`.`price` as `sub_total`
+<strong>FROM</strong> `cart`
+<strong>JO<strong>IN</strong></strong> `products` <strong>ON</strong> `products`.`id`=`cart`.`id_product`
+<strong>WHERE</strong> `id_customer` = '20'</td>
+        </tr>
+    
+    </tbody>
+</table>
+				</div>
+																										<div id="ci-files" class="tab">
+					<h2>Files <span>( 120 )</span></h2>
+
+					<table>
+    <tbody>
+    
+        <tr>
+            <td>App.php</td>
+            <td>APPPATH\Config\App.php</td>
+        </tr>
+    
+        <tr>
+            <td>Autoload.php</td>
+            <td>APPPATH\Config\Autoload.php</td>
+        </tr>
+    
+        <tr>
+            <td>Autoloader.php</td>
+            <td>VENDORPATH\laminas\laminas-zendframework-bridge\src\Autoloader.php</td>
+        </tr>
+    
+        <tr>
+            <td>BaseController.php</td>
+            <td>APPPATH\Controllers\BaseController.php</td>
+        </tr>
+    
+        <tr>
+            <td>Cache.php</td>
+            <td>APPPATH\Config\Cache.php</td>
+        </tr>
+    
+        <tr>
+            <td>ClassLoader.php</td>
+            <td>VENDORPATH\composer\ClassLoader.php</td>
+        </tr>
+    
+        <tr>
+            <td>CliRenderer.php</td>
+            <td>VENDORPATH\kint-php\kint\src\Renderer\CliRenderer.php</td>
+        </tr>
+    
+        <tr>
+            <td>Common.php</td>
+            <td>APPPATH\Common.php</td>
+        </tr>
+    
+        <tr>
+            <td>Constants.php</td>
+            <td>APPPATH\Config\Constants.php</td>
+        </tr>
+    
+        <tr>
+            <td>ContentSecurityPolicy.php</td>
+            <td>APPPATH\Config\ContentSecurityPolicy.php</td>
+        </tr>
+    
+        <tr>
+            <td>Database.php</td>
+            <td>APPPATH\Config\Database.php</td>
+        </tr>
+    
+        <tr>
+            <td>Events.php</td>
+            <td>APPPATH\Config\Events.php</td>
+        </tr>
+    
+        <tr>
+            <td>Exceptions.php</td>
+            <td>APPPATH\Config\Exceptions.php</td>
+        </tr>
+    
+        <tr>
+            <td>Filters.php</td>
+            <td>APPPATH\Config\Filters.php</td>
+        </tr>
+    
+        <tr>
+            <td>Functions.php</td>
+            <td>VENDORPATH\phpunit\phpunit\src\Framework\Assert\Functions.php</td>
+        </tr>
+    
+        <tr>
+            <td>Kint.php</td>
+            <td>APPPATH\Config\Kint.php</td>
+        </tr>
+    
+        <tr>
+            <td>Kint.php</td>
+            <td>VENDORPATH\kint-php\kint\src\Kint.php</td>
+        </tr>
+    
+        <tr>
+            <td>Logger.php</td>
+            <td>APPPATH\Config\Logger.php</td>
+        </tr>
+    
+        <tr>
+            <td>Modules.php</td>
+            <td>APPPATH\Config\Modules.php</td>
+        </tr>
+    
+        <tr>
+            <td>Paths.php</td>
+            <td>APPPATH\Config\Paths.php</td>
+        </tr>
+    
+        <tr>
+            <td>Renderer.php</td>
+            <td>VENDORPATH\kint-php\kint\src\Renderer\Renderer.php</td>
+        </tr>
+    
+        <tr>
+            <td>RewriteRules.php</td>
+            <td>VENDORPATH\laminas\laminas-zendframework-bridge\src\RewriteRules.php</td>
+        </tr>
+    
+        <tr>
+            <td>RichRenderer.php</td>
+            <td>VENDORPATH\kint-php\kint\src\Renderer\RichRenderer.php</td>
+        </tr>
+    
+        <tr>
+            <td>Routes.php</td>
+            <td>APPPATH\Config\Routes.php</td>
+        </tr>
+    
+        <tr>
+            <td>Services.php</td>
+            <td>APPPATH\Config\Services.php</td>
+        </tr>
+    
+        <tr>
+            <td>ShoppingCartController.php</td>
+            <td>APPPATH\Controllers\ShoppingCartController.php</td>
+        </tr>
+    
+        <tr>
+            <td>ShoppingCartModel.php</td>
+            <td>APPPATH\Models\ShoppingCartModel.php</td>
+        </tr>
+    
+        <tr>
+            <td>TextRenderer.php</td>
+            <td>VENDORPATH\kint-php\kint\src\Renderer\TextRenderer.php</td>
+        </tr>
+    
+        <tr>
+            <td>Toolbar.php</td>
+            <td>APPPATH\Config\Toolbar.php</td>
+        </tr>
+    
+        <tr>
+            <td>UserAgents.php</td>
+            <td>APPPATH\Config\UserAgents.php</td>
+        </tr>
+    
+        <tr>
+            <td>Utils.php</td>
+            <td>VENDORPATH\kint-php\kint\src\Utils.php</td>
+        </tr>
+    
+        <tr>
+            <td>Validation.php</td>
+            <td>APPPATH\Config\Validation.php</td>
+        </tr>
+    
+        <tr>
+            <td>View.php</td>
+            <td>APPPATH\Config\View.php</td>
+        </tr>
+    
+        <tr>
+            <td>autoload.php</td>
+            <td>VENDORPATH\autoload.php</td>
+        </tr>
+    
+        <tr>
+            <td>autoload.php</td>
+            <td>VENDORPATH\laminas\laminas-zendframework-bridge\src\autoload.php</td>
+        </tr>
+    
+        <tr>
+            <td>autoload_real.php</td>
+            <td>VENDORPATH\composer\autoload_real.php</td>
+        </tr>
+    
+        <tr>
+            <td>autoload_static.php</td>
+            <td>VENDORPATH\composer\autoload_static.php</td>
+        </tr>
+    
+        <tr>
+            <td>bootstrap.php</td>
+            <td>VENDORPATH\symfony\polyfill-ctype\bootstrap.php</td>
+        </tr>
+    
+        <tr>
+            <td>deep_copy.php</td>
+            <td>VENDORPATH\myclabs\deep-copy\src\DeepCopy\deep_copy.php</td>
+        </tr>
+    
+        <tr>
+            <td>development.php</td>
+            <td>APPPATH\Config\Boot\development.php</td>
+        </tr>
+    
+        <tr>
+            <td>function.php</td>
+            <td>VENDORPATH\symfony\deprecation-contracts\function.php</td>
+        </tr>
+    
+        <tr>
+            <td>index.php</td>
+            <td>FCPATH\index.php</td>
+        </tr>
+    
+        <tr>
+            <td>init.php</td>
+            <td>VENDORPATH\kint-php\kint\init.php</td>
+        </tr>
+    
+        <tr>
+            <td>init_helpers.php</td>
+            <td>VENDORPATH\kint-php\kint\init_helpers.php</td>
+        </tr>
+    
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">AutoloadConfig.php</td>
+            <td>SYSTEMPATH\Config\AutoloadConfig.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Autoloader.php</td>
+            <td>SYSTEMPATH\Autoloader\Autoloader.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseBuilder.php</td>
+            <td>SYSTEMPATH\Database\BaseBuilder.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseCollector.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\BaseCollector.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseConfig.php</td>
+            <td>SYSTEMPATH\Config\BaseConfig.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseConnection.php</td>
+            <td>SYSTEMPATH\Database\BaseConnection.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseHandler.php</td>
+            <td>SYSTEMPATH\Cache\Handlers\BaseHandler.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseModel.php</td>
+            <td>SYSTEMPATH\BaseModel.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseResult.php</td>
+            <td>SYSTEMPATH\Database\BaseResult.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">BaseService.php</td>
+            <td>SYSTEMPATH\Config\BaseService.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Builder.php</td>
+            <td>SYSTEMPATH\Database\MySQLi\Builder.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">CacheFactory.php</td>
+            <td>SYSTEMPATH\Cache\CacheFactory.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">CacheInterface.php</td>
+            <td>SYSTEMPATH\Cache\CacheInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">CodeIgniter.php</td>
+            <td>SYSTEMPATH\CodeIgniter.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Common.php</td>
+            <td>SYSTEMPATH\Common.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Config.php</td>
+            <td>SYSTEMPATH\Database\Config.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Connection.php</td>
+            <td>SYSTEMPATH\Database\MySQLi\Connection.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">ConnectionInterface.php</td>
+            <td>SYSTEMPATH\Database\ConnectionInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">ContentSecurityPolicy.php</td>
+            <td>SYSTEMPATH\HTTP\ContentSecurityPolicy.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Controller.php</td>
+            <td>SYSTEMPATH\Controller.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Database.php</td>
+            <td>SYSTEMPATH\Database\Database.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Database.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\Database.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">DebugToolbar.php</td>
+            <td>SYSTEMPATH\Filters\DebugToolbar.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">DotEnv.php</td>
+            <td>SYSTEMPATH\Config\DotEnv.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Events.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\Events.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Events.php</td>
+            <td>SYSTEMPATH\Events\Events.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Exceptions.php</td>
+            <td>SYSTEMPATH\Debug\Exceptions.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Factories.php</td>
+            <td>SYSTEMPATH\Config\Factories.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Factory.php</td>
+            <td>SYSTEMPATH\Config\Factory.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">FileHandler.php</td>
+            <td>SYSTEMPATH\Cache\Handlers\FileHandler.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">FileLocator.php</td>
+            <td>SYSTEMPATH\Autoloader\FileLocator.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Files.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\Files.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">FilterInterface.php</td>
+            <td>SYSTEMPATH\Filters\FilterInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Filters.php</td>
+            <td>SYSTEMPATH\Filters\Filters.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Header.php</td>
+            <td>SYSTEMPATH\HTTP\Header.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">IncomingRequest.php</td>
+            <td>SYSTEMPATH\HTTP\IncomingRequest.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Logger.php</td>
+            <td>SYSTEMPATH\Log\Logger.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">LoggerInterface.php</td>
+            <td>SYSTEMPATH\ThirdParty\PSR\Log\LoggerInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Logs.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\Logs.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Message.php</td>
+            <td>SYSTEMPATH\HTTP\Message.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">MessageInterface.php</td>
+            <td>SYSTEMPATH\HTTP\MessageInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">MessageTrait.php</td>
+            <td>SYSTEMPATH\HTTP\MessageTrait.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Model.php</td>
+            <td>SYSTEMPATH\Model.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Modules.php</td>
+            <td>SYSTEMPATH\Modules\Modules.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Query.php</td>
+            <td>SYSTEMPATH\Database\Query.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">QueryInterface.php</td>
+            <td>SYSTEMPATH\Database\QueryInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">RendererInterface.php</td>
+            <td>SYSTEMPATH\View\RendererInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Request.php</td>
+            <td>SYSTEMPATH\HTTP\Request.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">RequestInterface.php</td>
+            <td>SYSTEMPATH\HTTP\RequestInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">RequestTrait.php</td>
+            <td>SYSTEMPATH\HTTP\RequestTrait.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Response.php</td>
+            <td>SYSTEMPATH\HTTP\Response.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">ResponseInterface.php</td>
+            <td>SYSTEMPATH\HTTP\ResponseInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">ResponseTrait.php</td>
+            <td>SYSTEMPATH\API\ResponseTrait.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">ResponseTrait.php</td>
+            <td>SYSTEMPATH\HTTP\ResponseTrait.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Result.php</td>
+            <td>SYSTEMPATH\Database\MySQLi\Result.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">ResultInterface.php</td>
+            <td>SYSTEMPATH\Database\ResultInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">RouteCollection.php</td>
+            <td>SYSTEMPATH\Router\RouteCollection.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">RouteCollectionInterface.php</td>
+            <td>SYSTEMPATH\Router\RouteCollectionInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Router.php</td>
+            <td>SYSTEMPATH\Router\Router.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">RouterInterface.php</td>
+            <td>SYSTEMPATH\Router\RouterInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Routes.php</td>
+            <td>SYSTEMPATH\Config\Routes.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Routes.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\Routes.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Services.php</td>
+            <td>SYSTEMPATH\Config\Services.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Timer.php</td>
+            <td>SYSTEMPATH\Debug\Timer.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Timers.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\Timers.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Toolbar.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">URI.php</td>
+            <td>SYSTEMPATH\HTTP\URI.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">UserAgent.php</td>
+            <td>SYSTEMPATH\HTTP\UserAgent.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Validation.php</td>
+            <td>SYSTEMPATH\Validation\Validation.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">ValidationInterface.php</td>
+            <td>SYSTEMPATH\Validation\ValidationInterface.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">View.php</td>
+            <td>SYSTEMPATH\Config\View.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">View.php</td>
+            <td>SYSTEMPATH\View\View.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">Views.php</td>
+            <td>SYSTEMPATH\Debug\Toolbar\Collectors\Views.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">bootstrap.php</td>
+            <td>SYSTEMPATH\bootstrap.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">rewrite.php</td>
+            <td>SYSTEMPATH\Commands\Server\rewrite.php</td>
+        </tr>
+    
+        <tr class="muted">
+            <td class="debug-bar-width20e">url_helper.php</td>
+            <td>SYSTEMPATH\Helpers\url_helper.php</td>
+        </tr>
+    
+    </tbody>
+</table>
+				</div>
+															<div id="ci-routes" class="tab">
+					<h2>Routes <span></span></h2>
+
+					<h3>Matched Route</h3>
+
+<table>
+    <tbody>
+    
+        <tr>
+            <td>Directory:</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Controller:</td>
+            <td>\App\Controllers\ShoppingCartController</td>
+        </tr>
+        <tr>
+            <td>Method:</td>
+            <td>get_cartJSON</td>
+        </tr>
+        <tr>
+            <td>Params:</td>
+            <td>1 / 1</td>
+        </tr>
+        
+            <tr class="route-params-item">
+                <td>id_customer</td>
+                <td>20</td>
+            </tr>
+        
+    
+    </tbody>
+</table>
+
+
+<h3>Defined Routes</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Method</th>
+            <th>Route</th>
+            <th>Handler</th>
+        </tr>
+    </thead>
+    <tbody>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/">/</td>
+            <td>\App\Controllers\ProductController::index</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>user/auth/check_user/(.*)</div><form data-debugbar-route-tpl="user/auth/check_user/?">user/auth/check_user/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\UserController::check_user/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/user/product/products">user/product/products</td>
+            <td>\App\Controllers\ProductController::getAllProduct</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>user/product/detail/(.*)</div><form data-debugbar-route-tpl="user/product/detail/?">user/product/detail/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\ProductController::productDetail/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/user/cart/view">user/cart/view</td>
+            <td>\App\Controllers\ShoppingCartController::cart_view</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>user/cart/count/(.*)</div><form data-debugbar-route-tpl="user/cart/count/?">user/cart/count/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\ShoppingCartController::cart_count/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>user/cart/sum/(.*)</div><form data-debugbar-route-tpl="user/cart/sum/?">user/cart/sum/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\ShoppingCartController::total_sum/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/user/order/complete">user/order/complete</td>
+            <td>\App\Controllers\OrderCompleteController::index</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/user/purchase/view">user/purchase/view</td>
+            <td>\App\Controllers\PurchaseController::purchaseView</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>user/purchase/detail/(.*)</div><form data-debugbar-route-tpl="user/purchase/detail/?">user/purchase/detail/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\PurchaseController::purchaseDetail/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>user/purchase/total/(.*)</div><form data-debugbar-route-tpl="user/purchase/total/?">user/purchase/total/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\PurchaseController::purchaseTotal/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>user/purchase/check/(.*)</div><form data-debugbar-route-tpl="user/purchase/check/?">user/purchase/check/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\PurchaseController::checkPurchase/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/user/about">user/about</td>
+            <td>\App\Controllers\CustomerController::about</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/admin/dashboard">admin/dashboard</td>
+            <td>\App\Controllers\AdminController::index</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/admin/purchase-control">admin/purchase-control</td>
+            <td>\App\Controllers\AdminController::purchaseControl</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/admin/produk">admin/produk</td>
+            <td>\App\Controllers\AdminController::produk</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/api/user/product/product-json">api/user/product/product-json</td>
+            <td>\App\Controllers\ProductController::productJSON</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/api/user/product/all-json">api/user/product/all-json</td>
+            <td>\App\Controllers\ProductController::getAllProductJSON</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>api/user/product/detail-json/(.*)</div><form data-debugbar-route-tpl="api/user/product/detail-json/?">api/user/product/detail-json/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\ProductController::productDetailJSON/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/api/user/customer/customer-json">api/user/customer/customer-json</td>
+            <td>\App\Controllers\CustomerController::customerJSON</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/api/user/customer/feedback-json">api/user/customer/feedback-json</td>
+            <td>\App\Controllers\CustomerController::feedbackJSON</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET"><div>api/user/cart/detail-json/(.*)</div><form data-debugbar-route-tpl="api/user/cart/detail-json/?">api/user/cart/detail-json/<input type="text" placeholder="$1"><input type="submit" value="Go" style="margin-left: 4px;"></form></td>
+            <td>\App\Controllers\ShoppingCartController::get_cartJSON/$1</td>
+        </tr>
+    
+        <tr>
+            <td>GET</td>
+            <td data-debugbar-route="GET" style="cursor: pointer;" title="http://localhost:8080/api/admin/purchase-control-json">api/admin/purchase-control-json</td>
+            <td>\App\Controllers\AdminController::purchaseControlJSON</td>
+        </tr>
+    
+        <tr>
+            <td>POST</td>
+            <td data-debugbar-route="POST">user/auth/register</td>
+            <td>\App\Controllers\UserController::register</td>
+        </tr>
+    
+        <tr>
+            <td>POST</td>
+            <td data-debugbar-route="POST">user/auth/login</td>
+            <td>\App\Controllers\UserController::login</td>
+        </tr>
+    
+        <tr>
+            <td>POST</td>
+            <td data-debugbar-route="POST">user/cart</td>
+            <td>\App\Controllers\ShoppingCartController::cart</td>
+        </tr>
+    
+        <tr>
+            <td>POST</td>
+            <td data-debugbar-route="POST">user/purchase</td>
+            <td>\App\Controllers\PurchaseController::purchase</td>
+        </tr>
+    
+        <tr>
+            <td>POST</td>
+            <td data-debugbar-route="POST">admin/auth/login</td>
+            <td>\App\Controllers\AdminController::login</td>
+        </tr>
+    
+        <tr>
+            <td>PUT</td>
+            <td data-debugbar-route="PUT">user/cart/update/(.*)</td>
+            <td>\App\Controllers\ShoppingCartController::update_cart_quantity/$1</td>
+        </tr>
+    
+        <tr>
+            <td>PUT</td>
+            <td data-debugbar-route="PUT">user/purchase/payment/(.*)</td>
+            <td>\App\Controllers\PurchaseController::pay/$1</td>
+        </tr>
+    
+        <tr>
+            <td>PUT</td>
+            <td data-debugbar-route="PUT">user/purchase/updateTotal/(.*)</td>
+            <td>\App\Controllers\PurchaseController::updateTotal/$1</td>
+        </tr>
+    
+        <tr>
+            <td>PUT</td>
+            <td data-debugbar-route="PUT">api/admin/update-status-purchase/(.*)</td>
+            <td>\App\Controllers\AdminController::updateStatusPurchase/$1</td>
+        </tr>
+    
+        <tr>
+            <td>DELETE</td>
+            <td data-debugbar-route="DELETE">user/cart/remove/(.*)</td>
+            <td>\App\Controllers\ShoppingCartController::remove_cart/$1</td>
+        </tr>
+    
+        <tr>
+            <td>CLI</td>
+            <td data-debugbar-route="CLI">migrations/([^/]+)/([^/]+)</td>
+            <td>\CodeIgniter\Commands\MigrationsCommand::$1/$2</td>
+        </tr>
+    
+        <tr>
+            <td>CLI</td>
+            <td data-debugbar-route="CLI">migrations/([^/]+)</td>
+            <td>\CodeIgniter\Commands\MigrationsCommand::$1</td>
+        </tr>
+    
+        <tr>
+            <td>CLI</td>
+            <td data-debugbar-route="CLI">migrations</td>
+            <td>\CodeIgniter\Commands\MigrationsCommand::index</td>
+        </tr>
+    
+        <tr>
+            <td>CLI</td>
+            <td data-debugbar-route="CLI">ci(.*)</td>
+            <td>\CodeIgniter\CLI\CommandRunner::index/$1</td>
+        </tr>
+    
+    </tbody>
+</table>
+				</div>
+															<div id="ci-events" class="tab">
+					<h2>Events <span></span></h2>
+
+					<table>
+    <thead>
+        <tr>
+            <th class="debug-bar-width6r">Time</th>
+            <th>Event Name</th>
+            <th>Times Called</th>
+        </tr>
+    </thead>
+    <tbody>
+    
+        <tr>
+            <td class="narrow">6.59 ms</td>
+            <td>pre_system</td>
+            <td>1</td>
+        </tr>
+    
+        <tr>
+            <td class="narrow">0.02 ms</td>
+            <td>dbquery</td>
+            <td>1</td>
+        </tr>
+    
+    </tbody>
+</table>
+				</div>
+															<div id="ci-history" class="tab">
+					<h2>History <span></span></h2>
+
+					<table>
+    <thead>
+        <tr>
+            <th>Action</th>
+            <th>Datetime</th>
+            <th>Status</th>
+            <th>Method</th>
+            <th>URL</th>
+            <th>Content-Type</th>
+            <th>Is AJAX?</th>
+        </tr>
+    </thead>
+    <tbody>
+    
+        <tr data-active="1" class="current">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879349">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:15:49</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/cart/detail-json/20</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879345">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:15:45</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/cart/detail-json/20</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879344">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:15:44</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/cart/count/20</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879222">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:13:42</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/cart/detail-json/20</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879221">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:13:41</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/cart/view</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>No</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879220">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:13:40</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879169">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:49</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879168">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:48</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/product/detail/2</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>No</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879167">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:47</td>
+            <td>201</td>
+            <td>POST</td>
+            <td>http://localhost:8080/user/cart</td>
+            <td>application/json; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879160">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:40</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879159">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:39</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/product/detail/2</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>No</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879150">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:30</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879149">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:29</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/product/detail/2</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>No</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879142">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:22</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879141">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:12:21</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/product/detail/1</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>No</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879112">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:11:52</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879111">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:11:51</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/product/detail/1</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>No</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879035">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:10:35</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879034">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:10:34</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/user/product/detail/1</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>No</td>
+        </tr>
+    
+        <tr data-active="">
+        	<td class="debug-bar-width70p">
+            	<button class="ci-history-load" data-time="1620879022">Load</button>
+            </td>
+            <td class="debug-bar-width140p">2021-05-12 23:10:22</td>
+            <td>200</td>
+            <td>GET</td>
+            <td>http://localhost:8080/api/user/customer/feedback-json</td>
+            <td>text/html; charset=UTF-8</td>
+            <td>Yes</td>
+        </tr>
+    
+    </tbody>
+</table>
+				</div>
+						
+	<!-- In & Out -->
+	<div id="ci-vars" class="tab">
+
+		<!-- VarData from Collectors -->
+					
+				<a href="javascript:void(0)" onclick="ciDebugBar.toggleDataTable('view-data'); return false;">
+					<h2>View Data</h2>
+				</a>
+
+				
+					<table id="view-data_table">
+						<tbody>
+												</tbody>
+					</table>
+
+									
+		<!-- Session -->
+		<a href="javascript:void(0)" onclick="ciDebugBar.toggleDataTable('session'); return false;">
+			<h2>Session User Data</h2>
+		</a>
+
+					<p class="muted">Session doesn't seem to be active.</p>
+		
+		<h2>Request <span>( HTTP/1.1 )</span></h2>
+
+		
+		
+					<a href="javascript:void(0)" onclick="ciDebugBar.toggleDataTable('request_headers'); return false;">
+				<h3>Headers</h3>
+			</a>
+
+			<table id="request_headers_table">
+				<tbody>
+									<tr>
+						<td>Host</td>
+						<td>localhost:8080</td>
+					</tr>
+									<tr>
+						<td>User-Agent</td>
+						<td>Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0</td>
+					</tr>
+									<tr>
+						<td>Accept</td>
+						<td>application/json, text/plain, */*</td>
+					</tr>
+									<tr>
+						<td>Accept-Language</td>
+						<td>en</td>
+					</tr>
+									<tr>
+						<td>Accept-Encoding</td>
+						<td>gzip, deflate</td>
+					</tr>
+									<tr>
+						<td>X-Requested-With</td>
+						<td>XMLHttpRequest</td>
+					</tr>
+									<tr>
+						<td>Connection</td>
+						<td>keep-alive</td>
+					</tr>
+									<tr>
+						<td>Referer</td>
+						<td>http://localhost:8080/user/cart/view</td>
+					</tr>
+									<tr>
+						<td>Cache-Control</td>
+						<td>max-age=0</td>
+					</tr>
+								</tbody>
+			</table>
+		
+		
+		<h2>Response
+			<span>( 200 - OK )</span>
+		</h2>
+
+					<a href="javascript:void(0)" onclick="ciDebugBar.toggleDataTable('response_headers'); return false;">
+				<h3>Headers</h3>
+			</a>
+
+			<table id="response_headers_table">
+				<tbody>
+									<tr>
+						<td>Host</td>
+						<td>localhost:8080</td>
+					</tr>
+									<tr>
+						<td>User-Agent</td>
+						<td>Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0</td>
+					</tr>
+									<tr>
+						<td>Accept</td>
+						<td>application/json, text/plain, */*</td>
+					</tr>
+									<tr>
+						<td>Accept-Language</td>
+						<td>en</td>
+					</tr>
+									<tr>
+						<td>Accept-Encoding</td>
+						<td>gzip, deflate</td>
+					</tr>
+									<tr>
+						<td>X-Requested-With</td>
+						<td>XMLHttpRequest</td>
+					</tr>
+									<tr>
+						<td>Connection</td>
+						<td>keep-alive</td>
+					</tr>
+									<tr>
+						<td>Referer</td>
+						<td>http://localhost:8080/user/cart/view</td>
+					</tr>
+									<tr>
+						<td>Cache-Control</td>
+						<td>max-age=0</td>
+					</tr>
+								</tbody>
+			</table>
+			</div>
+
+	<!-- Config Values -->
+	<div id="ci-config" class="tab">
+		<h2>System Configuration</h2>
+
+		<p class="debug-bar-alignRight">
+	<a href="https://codeigniter4.github.io/CodeIgniter4/index.html" target="_blank">Read the CodeIgniter docs...</a>
+</p>
+
+<table>
+	<tbody>
+		<tr>
+			<td>CodeIgniter Version:</td>
+			<td>4.1.1</td>
+		</tr>
+		<tr>
+			<td>PHP Version:</td>
+			<td>7.3.7</td>
+		</tr>
+		<tr>
+			<td>PHP SAPI:</td>
+			<td>cli-server</td>
+		</tr>
+		<tr>
+			<td>Environment:</td>
+			<td>development</td>
+		</tr>
+		<tr>
+			<td>Base URL:</td>
+			<td>
+									http://localhost:8080
+							</td>
+		</tr>
+		<tr>
+			<td>Timezone:</td>
+			<td>America/Chicago</td>
+		</tr>
+		<tr>
+			<td>Locale:</td>
+			<td>en</td>
+		</tr>
+		<tr>
+			<td>Content Security Policy Enabled:</td>
+			<td> No </td>
+		</tr>
+	</tbody>
+</table>
+	</div>
+</div>
+<style type="text/css">
+		.debu</style></div></body></html>
+<!-- DEBUG-VIEW ENDED 3 APPPATH\Views\layout\template.php -->
+<!-- DEBUG-VIEW ENDED 4 APPPATH\Views\cart\cart.php -->

@@ -5,14 +5,24 @@ body {
   height: 100%;
 }
 
+/* color */
+
+.green-custom{
+  background-color: #69ae3c;
+}
+
 /* Navbar */
+
+.bg-grullo{
+  background-color: #d3d0cb;
+}
 
 .top-nav {
   margin: 0;
-  background-color: #393e41 !important;
+  background-color: #1111 !important;
 }
 
-.top-nav p {
+.bg-rich-black p {
   padding-top: 10px;
   color: white;
 }
@@ -22,11 +32,7 @@ body {
 }
 
 .cart-mobile {
-  visibility: collapse;
-}
-
-.bg-green {
-  background-color: #d3d0cb;
+  display: none;
 }
 
 .bg-gray{
@@ -152,73 +158,6 @@ body {
   justify-content: center;
 }
 
-/* Modal Login */
-
-.modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: table;
-  transition: opacity 0.3s ease;
-}
-
-.modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.modal-container {
-  width: 400px;
-  margin: 0px auto;
-  padding: 20px 30px;
-  background-color: #fff;
-  border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
-  transition: all 0.3s ease;
-  font-family: Helvetica, Arial, sans-serif;
-}
-
-.modal-header h3 {
-  margin-top: 0;
-  color: #42b983;
-}
-
-.modal-body {
-  margin: 20px 0;
-}
-
-.modal-default-button {
-  float: right;
-  border: none;
-}
-
-/*
-   * The following styles are auto-applied to elements with
-   * transition="modal" when their visibility is toggled
-   * by Vue.js.
-   *
-   * You can easily play with the modal transition by editing
-   * these styles.
-   */
-
-.modal-enter {
-  opacity: 0;
-}
-
-.modal-leave-active {
-  opacity: 0;
-}
-
-.modal-enter .modal-container,
-.modal-leave-active .modal-container {
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
-}
-
 .login-register-btn {
   text-decoration: none;
   color: #393e41;
@@ -226,52 +165,211 @@ body {
 }
 
 .login-register-btn:hover {
-  color: #e7bb41;
+  color: #69ae3c;
 }
 
+.shopping-cart-mobile{
+  display: none;
+}
+
+.modal {
+  overflow-y: auto;
+}
+
+.form-control{
+  border-radius: 0px;
+}
+
+.form-control:focus {
+  border-radius: 0px;
+  border-color: #69ae3c;
+  box-shadow: 0px 0px 0px #69ae3c inset, 0px 0px 2px #69ae3c;
+}
+
+.badge{
+  border-radius: 0px;
+}
+
+.bg-carousel{
+  background-color: #d8cec2;
+  height: 400px;
+}
+
+.wa-chat-box-brand{
+  background-color: white;
+}
+
+.btn-custom:hover{
+    background-color: #416b25;
+}
+
+.dropdown-menu{
+  border-radius: 0px;
+}
+
+.mobile-purchase{
+  display: none;
+}
+
+.nav-tabs .nav-link{
+  border-radius: 0px;
+}
+
+a{
+  color: #69ae3c;
+}
+
+/* feedback styling */
+/* *{font-family:"Courier New", Courier, monospace} */
+
+form p,
+form input[type="submit"] {
+  font-size: 20px;
+}
+
+#wrapper form input[type="submit"] {
+  border: 1px solid #d9d9d9;
+  background-color: #efefef;
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+label {
+  color: grey;
+}
+
+.clasificacion {
+  direction: rtl;
+  unicode-bidi: bidi-override;
+}
+
+label:hover,
+label:hover ~ label {
+  color: orange;
+}
+
+input[type="radio"]:checked ~ label {
+  color: orange;
+}
 /* responsive top nav on mobile view */
 
 @media only screen and (max-width: 767px) {
   /* body {
         font-size: 3.5vw;
     } */
-  .top-nav #phone-number,
+  .bg-rich-black #phone-number,
   #email {
     display: none;
   }
-  .top-nav #response-text {
+
+  .bg-rich-black #response-text {
     margin: auto;
     padding-top: 0;
   }
+
   .navbar {
     display: flex;
   }
+
   .navbar-brand {
     margin: auto;
   }
+
   .cart-mobile {
-    visibility: visible;
+    display: block;
   }
+
   .cart-desktop {
-    visibility: collapse;
+    display: none;
   }
+
   .row-mobile > * {
     width: 50% !important;
   }
+
   .btn-mobile {
     margin-top: 5px;
   }
+
   .detail-desktop {
     display: none;
   }
+
   .detail-mobile {
     display: block;
   }
+
   .footer-mobile {
     text-align: center;
+  }
+
+  .shopping-cart-desktop{
+    display: none;
+  }
+
+  .shopping-cart-mobile{
+    display: block;
+  }
+
+  .scrolling-wrapper{
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+
+  .scrolling-wrapper .card{
+    display: inline-block;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrolling-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrolling-wrapper {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  }
+
+  .modal-container {
+    width: 300px;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.33);
+    transition: all 0.3s ease;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  .body.modal-open{
+    overflow: hidden;
+  }
+
+  .logo{
+    display: none;
+  }
+  
+  .mobile-purchase{
+    display: block;
+  }
+
+  .purchase-desktop{
+    display: none;
   }
 }
 
 .gender {
   margin-left: 30px;
+}
+
+.card{
+  border-radius: 0px;
+}
+
+.btn{
+  border-radius: 0px!important;
 }

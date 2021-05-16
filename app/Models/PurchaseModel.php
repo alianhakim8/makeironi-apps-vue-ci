@@ -10,5 +10,11 @@ class PurchaseModel extends Model
     protected $primaryKey = 'id_purchase';
 
     // allowed 
-    protected $allowedFields = ['id_purchase', 'invoice_number', 'id_customer', 'total'];
+    protected $allowedFields = ['id_purchase', 'invoice_number', 'id_customer', 'total', 'status_payment', 'verify_payment'];
+
+    public function getPurchase()
+    {
+        return $this->db->table('purchase')
+            ->get()->getResultArray();
+    }
 }

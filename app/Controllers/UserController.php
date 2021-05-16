@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use CodeIgniter\API\ResponseTrait;
+use \Firebase\JWT\JWT;
 
 class UserController extends BaseController
 {
@@ -12,6 +13,11 @@ class UserController extends BaseController
     public function __construct()
     {
         $this->model = new UserModel();
+    }
+
+    private function getKey()
+    {
+        return "my_application_secret";
     }
 
     public function register()
@@ -54,20 +60,44 @@ class UserController extends BaseController
         if ($this->request) {
             if ($this->request->getJSON()) {
                 $json = $this->request->getJSON();
-                // $session = session();
                 $email = $json->email;
                 $password = $json->password;
                 $user = $this->model->where('email', $email)->first();
                 if (password_verify($password, $user['password'])) {
+                    $key = $this->getKey();
+                    $iat = time();
+                    $nbf = $iat + 10;
+                    $exp = $iat + 3600;
+
+                    $payload = array(
+                        "iss" => "The_claim",
+                        "aud" => "The_Aud",
+                        "iat" => $iat,
+                        "nbf" => $nbf,
+                        "exp" => $exp,
+                        "data" => $user['name'],
+                    );
+
+                    $token = JWT::encode($payload, $key);
+                    // $decoded = JWT::decode($token, $key, array("HS256"));
+
+                    // if ($decoded) {
                     return $this->respond([
                         'code' => 201,
                         'message' => 'Login berhasil',
                         'id' => $user['id_customer'],
-                        'email' => $user['email'],
+                        // 'email' => $user['email'],
                         'name' => $user['name'],
-                        'logged_in' => TRUE
+                        'logged_in' => TRUE,
+                        'token' => $token
                     ], 201);
-                    // $user_logged_in = [
+                    // } else {
+                    //     return $this->respond([
+                    //         'code' => 400,
+                    //         'message' => 'Login gagal, cek kembali email & password',
+                    //     ], 400);
+                    // }
+
                     //     'id' => $user['id'],
                     //     'email' => $user['email'],
                     //     'name' => $user['name'],
@@ -86,10 +116,36 @@ class UserController extends BaseController
                 $password = $this->request->getPost('password');
                 $user = $this->model->where('email', $email)->first();
                 if (password_verify($password, $user['password'])) {
+
+                    $key = $this->getKey();
+                    $iat = time();
+                    $nbf = $iat + 10;
+                    $exp = $iat + 3600;
+
+                    $payload = array(
+                        "iss" => "The_claim",
+                        "aud" => "The_Aud",
+                        "iat" => $iat,
+                        "nbf" => $nbf,
+                        "exp" => $exp,
+                        "data" => $user,
+                    );
+
+                    $token = JWT::encode($payload, $key);
+                    // $decoded = JWT::decode($token, $key, array("HS256"));
+
+                    // if ($decoded) {
+                    //     return $this->respond([
+                    //         'code' => 201,
+                    //         'message'    => 'Login berhasil',
+                    //         'token' => $token
+                    //     ], 201);
+                    // } else {
                     return $this->respond([
-                        'code' => 201,
-                        'message'    => 'Login berhasil',
-                    ], 201);
+                        'code' => 400,
+                        'message'    => 'Login gagal, cek kembali email & password',
+                    ], 400);
+                    // }
                 } else {
                     return $this->respond([
                         'code' => 400,
@@ -100,17 +156,18 @@ class UserController extends BaseController
         }
     }
 
-    public function check_user($email){
+    public function check_user($email)
+    {
         $user = $this->model->where('email', $email)->first();
-        if($user){
+        if ($user) {
             return $this->respond([
                 'code' => 200,
-                'logged_in'=> true,
+                'logged_in' => true,
             ], 200);
-        }else{
+        } else {
             return $this->respond([
                 'code' => 400,
-                'logged_in'=> false,
+                'logged_in' => false,
             ], 400);
         }
     }

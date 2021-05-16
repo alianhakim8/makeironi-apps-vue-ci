@@ -35,45 +35,136 @@ $routes->setAutoRoute(true);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 // $routes->get('/', 'Home::index');
+
+// // product view
+// $routes->group('/product', function ($routes) {
+// 	$routes->get('all', 'ProductController::getAllProduct');
+// 	$routes->get('detail/(:any)', 'ProductController::productDetail/$1');
+// });
+
+// Auth
+
+// // product JSON
+// $routes->get('/product-json', 'ProductController::productJSON');
+// $routes->get('/product-all-json', 'ProductController::getAllProductJSON');
+// $routes->get('/product-detail-json/(:any)', 'ProductController::productDetailJSON/$1');
+
+// customer
+// $routes->get('/login', 'CustomerController::login');
+// $routes->get('/customer/feedback-json', 'CustomerController::feedbackJSON');
+// $routes->get('/customer/customer-json', 'CustomerController::customerJSON');
+
+// $routes->get('/check_user/(:any)', 'UserController::check_user/$1');
+
+// cart
+// $routes->get('/cart-view', 'ShoppingCartController::cart_view');
+// $routes->post('/cart', 'ShoppingCartController::cart');
+// $routes->get('/cart-detail-json/(:any)', 'ShoppingCartController::get_cartJSON/$1');
+// $routes->delete('/remove-cart/(:any)', 'ShoppingCartController::remove_cart/$1');
+// $routes->get('/cart-count/(:any)', 'ShoppingCartController::cart_count/$1');
+// $routes->put('/cart-quantity-update/(:any)', 'ShoppingCartController::update_cart_quantity/$1');
+// $routes->get('/cart-sum/(:any)', 'ShoppingCartController::total_sum/$1');
+
+// $routes->put('/updateTotal/(:any)', 'PurchaseController::updateTotal/$1');
+// $routes->post('/purchase', 'PurchaseController::purchase');
+// $routes->get('/purchase-view', 'PurchaseController::purchaseView');
+// $routes->get('/purchase-detail/(:any)', 'PurchaseController::purchaseDetail/$1');
+// $routes->get('/purchase-total/(:any)', 'PurchaseController::purchaseTotal/$1');
+// $routes->put('/payment/(:any)', 'PurchaseController::pay/$1');
+
+// order complete
+// $routes->get('/order-complete', 'OrderCompleteController::index');
+// $routes->get('/contact', 'CustomerController::contact');
+// $routes->get('/about', 'CustomerController::about');
+
+// View
 $routes->get('/', 'ProductController::index');
-// product view
-$routes->group('/product', function ($routes) {
-	$routes->get('all', 'ProductController::getAllProduct');
-	$routes->get('detail/(:any)', 'ProductController::productDetail/$1');
+
+// USER
+$routes->group('user', function ($routes) {
+	$routes->group('auth', function ($routes) {
+		$routes->post('register', 'UserController::register');
+		$routes->post('login', 'UserController::login');
+		$routes->get('check_user/(:any)', 'UserController::check_user/$1');
+	});
+
+	$routes->group('product', function ($routes) {
+		$routes->get('products', 'ProductController::getAllProduct');
+		$routes->get('detail/(:any)', 'ProductController::productDetail/$1');
+	});
+
+	$routes->group('cart', function ($routes) {
+		$routes->post('/', 'ShoppingCartController::cart');
+		$routes->get('view', 'ShoppingCartController::cart_view');
+		$routes->delete('remove/(:any)', 'ShoppingCartController::remove_cart/$1');
+		$routes->get('count/(:any)', 'ShoppingCartController::cart_count/$1');
+		$routes->put('update/(:any)', 'ShoppingCartController::update_cart_quantity/$1');
+		$routes->get('sum/(:any)', 'ShoppingCartController::total_sum/$1');
+	});
+
+	$routes->group('order', function ($routes) {
+		$routes->get('complete', 'OrderCompleteController::index');
+	});
+
+	$routes->group('purchase', function ($routes) {
+		$routes->post('/', 'PurchaseController::purchase');
+		$routes->get('view', 'PurchaseController::purchaseView');
+		$routes->get('detail/(:any)', 'PurchaseController::purchaseDetail/$1');
+		$routes->get('total/(:any)', 'PurchaseController::purchaseTotal/$1');
+		$routes->get('check/(:any)', 'PurchaseController::checkPurchase/$1');
+		$routes->put('payment/(:any)', 'PurchaseController::pay/$1');
+		$routes->put('updateTotal/(:any)', 'PurchaseController::updateTotal/$1');
+		$routes->get('payment/view', 'PurchaseController::paymentView');
+		$routes->get('payment/view/detail(:any)', 'PurchaseController::paymentDetail/$1');
+	});
+
+
+	// $routes->get('contact', 'CustomerController::contact');
+	$routes->get('about', 'CustomerController::about');
 });
 
 
-// Auth
-$routes->post('/auth/register', 'UserController::register');
-$routes->post('/auth/login', 'UserController::login');
-
-// product JSON
-$routes->get('/product-json', 'ProductController::productJSON');
-$routes->get('/product-all-json', 'ProductController::getAllProductJSON');
-$routes->get('/product-detail-json/(:any)', 'ProductController::productDetailJSON/$1');
-
-// customer
-$routes->get('/login', 'CustomerController::login');
-$routes->get('/customer/feedback-json', 'CustomerController::feedbackJSON');
-$routes->get('/customer/customer-json', 'CustomerController::customerJSON');
-
-$routes->get('/check_user/(:any)', 'UserController::check_user/$1');
+// ADMIN
+$routes->group('admin', function ($routes) {
+	$routes->group('auth', function ($routes) {
+		$routes->post('login', 'AdminController::login');
+	});
+	$routes->get('dashboard', 'AdminController::index');
+	$routes->get('purchase-control', 'AdminController::purchaseControl');
+	$routes->get('produk', 'AdminController::produk');
+});
 
 
-// cart
-$routes->get('/cart-view', 'ShoppingCartController::cart_view');
-$routes->post('/cart', 'ShoppingCartController::cart');
-$routes->get('/cart-detail-json/(:any)', 'ShoppingCartController::get_cartJSON/$1');
-$routes->delete('/remove-cart/(:any)', 'ShoppingCartController::remove_cart/$1');
-$routes->get('/cart-count/(:any)', 'ShoppingCartController::cart_count/$1');
-$routes->put('/cart-quantity-update/(:any)', 'ShoppingCartController::update_cart_quantity/$1');
-$routes->get('/cart-sum/(:any)', 'ShoppingCartController::total_sum/$1');
+// API
+$routes->group('api', function ($routes) {
+	$routes->group('user', function ($routes) {
+		$routes->group('product', function ($routes) {
+			$routes->get('product-json', 'ProductController::productJSON');
+			$routes->get('all-json', 'ProductController::getAllProductJSON');
+			$routes->get('detail-json/(:any)', 'ProductController::productDetailJSON/$1');
+		});
+		$routes->group('customer', function ($routes) {
+			$routes->get('customer-json', 'CustomerController::customerJSON');
+			$routes->get('feedback-json', 'CustomerController::feedbackJSON');
+		});
+		$routes->group('cart', function ($routes) {
+			$routes->get('detail-json/(:any)', 'ShoppingCartController::get_cartJSON/$1');
+		});
 
-$routes->post('/purchase', 'PurchaseController::purchase');
-$routes->get('/purchase-view', 'PurchaseController::purchaseView');
+		$routes->group('payment', function ($routes) {
+			$routes->get('list-json', 'PurchaseController::paymentListJSON');
+			$routes->get('detail/(:any)', 'PurchaseController::paymentDetailJSON/$1');
+		});
+	});
 
-$routes->get('/contact', 'CustomerController::contact');
-$routes->get('/about', 'CustomerController::about');
+	$routes->group('admin', function ($routes) {
+		$routes->get('purchase-control-json', 'AdminController::purchaseControlJSON');
+		$routes->put('update-status-purchase/(:any)', 'AdminController::updateStatusPurchase/$1');
+	});
+});
+
+
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
