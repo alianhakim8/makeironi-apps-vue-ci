@@ -2,9 +2,7 @@
 let login = new Vue({
     el: "#appLogin",
     data: {
-        showModal: false,
-        showModalRegister: false,
-        formLogin: {
+        form: {
             name: "",
             email: "",
             password: "",
@@ -52,14 +50,14 @@ let login = new Vue({
     },
     methods: {
         loginMethod() {
-            if (this.formLogin.email == "" || this.formLogin.password == "") {
+            if (this.form.email == "" || this.form.password == "") {
                 this._data.error = true;
                 this._data.errorMessage = "Harap lengkapi data";
             } else {
                 axios
                     .post("/user/auth/login", {
-                        email: this.formLogin.email,
-                        password: this.formLogin.password,
+                        email: this.form.email,
+                        password: this.form.password,
                     })
                     .then(function (response) {
                         if (response.data.message) {
@@ -91,32 +89,30 @@ let login = new Vue({
         },
         register: function () {
             if (
-                this.formLogin.name == "" ||
-                this.formLogin.email == "" ||
-                this.formLogin.password == "" ||
-                this.formLogin.alamat == "" ||
-                this.formLogin.phone_number == "" ||
-                this.formLogin.tanggal_lahir == ""
+                this.form.name == "" ||
+                this.form.email == "" ||
+                this.form.password == "" ||
+                this.form.alamat == "" ||
+                this.form.phone_number == "" ||
+                this.form.tanggal_lahir == ""
             ) {
                 this.error = true;
                 this.errorMessage = "Harap lengkapi data";
-            } else {
+            } else if (this.validateEmail(this.form.email)) {
                 axios
                     .post("/user/auth/register", {
-                        name: this.formLogin.name,
-                        email: this.formLogin.email,
-                        password: this.formLogin.password,
-                        alamat: this.formLogin.alamat,
-                        no_hp: this.formLogin.phone_number,
-                        tanggal_lahir: this.formLogin.tanggal_lahir,
+                        name: this.form.name,
+                        email: this.form.email,
+                        password: this.form.password,
+                        alamat: this.form.alamat,
+                        no_hp: this.form.phone_number,
+                        tanggal_lahir: this.form.tanggal_lahir,
                     })
                     .then(function (response) {
                         Swal.fire({
                             icon: "success",
-                            title: response.data.message,
+                            title: `${response.data.message} Silahkan Login`,
                         });
-                        login._data.showModalRegister = false;
-                        login._data.showModal = true;
                     })
                     .catch(function (error) {
                         if (error.response) {
@@ -157,15 +153,18 @@ let login = new Vue({
         reloadPage() {
             window.location.reload();
         },
-        switchVisibility() {
-            this.passwordFieldType =
-                this.passwordFieldType === "password" ? "text" : "password";
-        },
         cart_count() {
             const id_customer = localStorage.getItem("id");
             axios.get("/user/cart/count/" + id_customer).then((response) => {
                 this.carts = response.data;
             });
         },
+        validateEmail(email) {
+            if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)) {
+                return (true)
+            }
+            alert('Email yang dimasukkan tidak valid');
+            return (false)
+        }
     },
 });

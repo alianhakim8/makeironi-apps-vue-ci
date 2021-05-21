@@ -44,7 +44,7 @@
                         </li>
                         <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">{{logged_in}}</a></li> -->
                         <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="#" class="nav-link">Cart 0</a></li> -->
-                        <!-- <li role="presentation" class="divider"> {{ formLogin.name }} </li> -->
+                        <!-- <li role="presentation" class="divider"> {{ form.name }} </li> -->
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="/user/order/complete" class="nav-link">Status Pemesanan</a></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="/user/purchase/payment/view" class="nav-link">Status Pembayaran</a></li>
                         <li role="presentation"><a role="menuitem" tabindex="-1" href="#" @click='logout' class="nav-link">Keluar</a></li>
@@ -84,9 +84,11 @@
                         <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if='error== true'>
                             {{ errorMessage }}
                         </div>
-                        <input type=" text" placeholder="Email" class="form-control" required autofocus v-model='formLogin.email'>
-                        <input :type="passwordFieldType" placeholder="Password" class="form-control mt-3 mb-3" v-model='formLogin.password'>
-                        <button class="btn green-custom text-light w-100" @click='loginMethod'>Login</button>
+                        <form>
+                            <input type="text" placeholder="Email" class="form-control" required autofocus v-model='form.email'>
+                            <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='form.password'>
+                            <button class="btn green-custom text-light w-100" @click='loginMethod'>Login</button>
+                        </form>
                         <div class="text-center">
                             <p class="mt-3">Atau</p>
                             <button class="btn btn-light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
@@ -101,8 +103,9 @@
                 </div>
             </div>
         </div>
+
         <!-- Modal Register -->
-        <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="container">
                     <div class="modal-content">
@@ -116,21 +119,21 @@
                             <div class="alert alert-warning alert-dismissible fade show" role="alert" v-if='error == true'>
                                 Harap lengkapi data
                             </div>
-                            <input type=" email" placeholder="Email" class="form-control" v-model='formLogin.email'>
-                            <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='formLogin.password'>
-                            <input type=" text" placeholder="Nama" class="form-control mt-3 mb-3" v-model='formLogin.name'>
-                            <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3" v-model='formLogin.alamat'>
-                            <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3" v-model='formLogin.phone_number'>
-                            <input type="text" placeholder="Tanggal Lahir" class="form-control mt-3 mb-3" onfocus="(this.type='date')" v-model='formLogin.tanggal_lahir'>
+                            <input type=" email" placeholder="Email" class="form-control" v-model='form.email'>
+                            <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='form.password'>
+                            <input type=" text" placeholder="Nama" class="form-control mt-3 mb-3" v-model='form.name'>
+                            <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3" v-model='form.alamat'>
+                            <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3" v-model='form.phone_number'>
+                            <input type="text" placeholder="Tanggal Lahir" class="form-control mt-3 mb-3" onfocus="(this.type='date')" v-model='form.tanggal_lahir'>
                             <!-- <p>Jenis Kelamin : </p> -->
-                            <!-- <input type="radio  " placeholder="Email" class="form-control" v-model='formLogin.email'> -->
+                            <!-- <input type="radio  " placeholder="Email" class="form-control" v-model='form.email'> -->
                             <!-- <div class="d-flex p-2">
                                 <div class="form-check">
-                                    <input class="form-check-input" v-model='formLogin.gender' type="radio" name="gender" id="rbMale" v-bind:value="'L'" checked>
+                                    <input class="form-check-input" v-model='form.gender' type="radio" name="gender" id="rbMale" v-bind:value="'L'" checked>
                                     <label class="form-check-label" for="radiobutton1"> Laki-Laki </label>
                                 </div>
                                 <div class="form-check gender">
-                                    <input class="form-check-input ml-2" v-model='formLogin.gender' type="radio" name="gender" id="rbFemail" v-bind:value="'P'">
+                                    <input class="form-check-input ml-2" v-model='form.gender' type="radio" name="gender" id="rbFemail" v-bind:value="'P'">
                                     <label class="form-check-label" for="exampleRadios2"> Perempuan </label>
                                 </div>
                             </div> -->
@@ -145,7 +148,6 @@
             </div>
         </div>
 </div>
-
 </nav>
 </div>
 
