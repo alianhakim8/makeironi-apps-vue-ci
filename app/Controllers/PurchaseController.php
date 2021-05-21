@@ -125,7 +125,6 @@ class PurchaseController extends BaseController
         return json_encode($purchase);
     }
 
-
     public function paymentListJSON()
     {
         $result = $this->model->findAll();
