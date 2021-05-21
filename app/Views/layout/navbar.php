@@ -122,8 +122,9 @@
                             <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3" v-model='formLogin.alamat'>
                             <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3" v-model='formLogin.phone_number'>
                             <input type="text" placeholder="Tanggal Lahir" class="form-control mt-3 mb-3" onfocus="(this.type='date')" v-model='formLogin.tanggal_lahir'>
-                            <p>Jenis Kelamin : </p>
-                            <div class="d-flex p-2">
+                            <!-- <p>Jenis Kelamin : </p> -->
+                            <!-- <input type="radio  " placeholder="Email" class="form-control" v-model='formLogin.email'> -->
+                            <!-- <div class="d-flex p-2">
                                 <div class="form-check">
                                     <input class="form-check-input" v-model='formLogin.gender' type="radio" name="gender" id="rbMale" v-bind:value="'L'" checked>
                                     <label class="form-check-label" for="radiobutton1"> Laki-Laki </label>
@@ -132,7 +133,7 @@
                                     <input class="form-check-input ml-2" v-model='formLogin.gender' type="radio" name="gender" id="rbFemail" v-bind:value="'P'">
                                     <label class="form-check-label" for="exampleRadios2"> Perempuan </label>
                                 </div>
-                            </div>
+                            </div> -->
                             <button class="btn green-custom text-light w-100 mt-2 mb-2" @click='register'>Register</button>
                             <div class="text-center mt-3">
                                 <a href="#" @click.prevent='hideRegister'></a>

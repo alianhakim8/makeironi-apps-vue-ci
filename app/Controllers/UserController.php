@@ -33,7 +33,7 @@ class UserController extends BaseController
                     'address' => $json->alamat,
                     'phone_number' => $json->no_hp,
                     'date_of_birth' => $json->tanggal_lahir,
-                    'gender' => $json->gender
+                    // 'gender' => $json->gender
                 ];
             } else {
                 //get request from Postman and more
@@ -44,7 +44,7 @@ class UserController extends BaseController
                     'address' => $this->request->getPost('alamat'),
                     'phone_number' => $this->request->getPost('no_hp'),
                     'date_of_birth' => $this->request->getPost('tanggal_lahir'),
-                    'gender' => $this->request->getPost('gender')
+                    // 'gender' => $this->request->getPost('gender')
                 ];
             }
             $this->model->insert($data);
@@ -79,6 +79,8 @@ class UserController extends BaseController
                     );
 
                     $token = JWT::encode($payload, $key);
+                    // var_dump($token);
+                    // die;
                     // $decoded = JWT::decode($token, $key, array("HS256"));
 
                     // if ($decoded) {
@@ -89,7 +91,7 @@ class UserController extends BaseController
                         // 'email' => $user['email'],
                         'name' => $user['name'],
                         'logged_in' => TRUE,
-                        'token' => $token
+                        // 'token' => $token
                     ], 201);
                     // } else {
                     //     return $this->respond([
@@ -117,7 +119,7 @@ class UserController extends BaseController
                 $user = $this->model->where('email', $email)->first();
                 if (password_verify($password, $user['password'])) {
 
-                    $key = $this->getKey();
+                    // $key = $this->getKey();
                     $iat = time();
                     $nbf = $iat + 10;
                     $exp = $iat + 3600;
