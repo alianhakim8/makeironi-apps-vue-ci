@@ -9,9 +9,9 @@
                 <div class="bg-carousel"></div>
                 <!-- <img class="d-block w-100" src="/img/carousel.jpeg" alt="First slide"> -->
                 <div class="carousel-caption">
-                    <h3 class="h3 text-dark fw-bold">Makroni Kriuk<br> Enaknya Sampe Ketulang :v</h3>
+                    <h3 class="h3 text-dark fw-bold">Makroni Kriuk<br> Gak Bikin Gemuk</h3>
                     <br>
-                    <a href="#buy" class="btn btn-dark">Beli Sekarang</a>
+                    <a href="#buy" class="btn btn-dark">Ayo Beli Sekarang !</a>
                 </div>
             </div>
         </div>

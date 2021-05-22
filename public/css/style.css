@@ -253,6 +253,22 @@ label:hover ~ label {
 input[type="radio"]:checked ~ label {
   color: orange;
 }
+
+.order-complete-mobile{
+  display: none;
+}
+
+.gender {
+  margin-left: 30px;
+}
+
+.card{
+  border-radius: 0px;
+}
+
+.btn{
+  border-radius: 0px!important;
+}
 /* responsive top nav on mobile view */
 
 @media only screen and (max-width: 767px) {
@@ -360,16 +376,12 @@ input[type="radio"]:checked ~ label {
   .purchase-desktop{
     display: none;
   }
-}
 
-.gender {
-  margin-left: 30px;
-}
+  .order-complete-mobile{
+    display: block;
+  }
 
-.card{
-  border-radius: 0px;
-}
-
-.btn{
-  border-radius: 0px!important;
+  .order-complete-desktop{
+    display: none;
+  }
 }

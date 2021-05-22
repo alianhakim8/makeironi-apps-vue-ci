@@ -81,14 +81,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if='error== true'>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if='error == true'>
                             {{ errorMessage }}
                         </div>
                         <form>
-                            <input type="text" placeholder="Email" class="form-control" required autofocus v-model='form.email'>
-                            <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='form.password'>
-                            <button class="btn green-custom text-light w-100" @click='loginMethod'>Login</button>
+                            <input type="text" placeholder="Email" class="form-control" required autofocus v-model='user.email'>
+                            <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='user.password'>
                         </form>
+                        <button class="btn green-custom text-light w-100" @click='loginMethod'>Login</button>
                         <div class="text-center">
                             <p class="mt-3">Atau</p>
                             <button class="btn btn-light"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
@@ -119,12 +119,12 @@
                             <div class="alert alert-warning alert-dismissible fade show" role="alert" v-if='error == true'>
                                 Harap lengkapi data
                             </div>
-                            <input type=" email" placeholder="Email" class="form-control" v-model='form.email'>
-                            <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='form.password'>
-                            <input type=" text" placeholder="Nama" class="form-control mt-3 mb-3" v-model='form.name'>
-                            <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3" v-model='form.alamat'>
-                            <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3" v-model='form.phone_number'>
-                            <input type="text" placeholder="Tanggal Lahir" class="form-control mt-3 mb-3" onfocus="(this.type='date')" v-model='form.tanggal_lahir'>
+                            <input type=" email" placeholder="Email" class="form-control" v-model='user.email'>
+                            <input type="password" placeholder="Password" class="form-control mt-3 mb-3" v-model='user.password'>
+                            <input type=" text" placeholder="Nama" class="form-control mt-3 mb-3" v-model='user.name'>
+                            <input type="text-area" placeholder="Alamat" class="form-control mt-3 mb-3" v-model='user.alamat'>
+                            <input type="text" placeholder="No.Hp" class="form-control mt-3 mb-3" v-model='user.phone_number'>
+                            <input type="text" placeholder="Tanggal Lahir" class="form-control mt-3 mb-3" onfocus="(this.type='date')" v-model='user.tanggal_lahir'>
                             <!-- <p>Jenis Kelamin : </p> -->
                             <!-- <input type="radio  " placeholder="Email" class="form-control" v-model='form.email'> -->
                             <!-- <div class="d-flex p-2">
