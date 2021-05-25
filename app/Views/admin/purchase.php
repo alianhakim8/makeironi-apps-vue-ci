@@ -45,5 +45,5 @@
 </div>
 
 
-<script src="/js/admin/purchaseControl.js"></script>
+<script src="/js/users/admin/purchaseControl.js"></script>
 <?= $this->endSection() ?>

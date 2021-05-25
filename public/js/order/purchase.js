@@ -5,7 +5,8 @@ let purchase = new Vue({
         no_rek: '12312398',
         cart: {},
         total_tagihan: 0,
-        status_: null
+        status_: null,
+        img: null,
     },
     mounted() {
         // if (this.cart.total > 0) {
@@ -53,38 +54,48 @@ let purchase = new Vue({
                 //    handle true action
             }
         },
-        payment() {
-            const status_payment = 1;
-            let id_purchase = this.cart.id_purchase;
-            let id_customer = localStorage.getItem('id');
-            axios
-                .put(`/user/purchase/payment/${id_purchase}`, {
-                    status_payment: 1,
-                    id_customer: id_customer,
-                    invoice_number: this.cart.invoice_number
-                })
-                .then((response) => {
-                    alert(response);
-                    window.location.href = '/user/order/complete'
-                })
-                .catch(function (error) {
-                    if (error.response) {
-                        // Request made and server responded
-                        console.info(error.response.data);
-                        console.info(error.response.status);
-                        console.info(error.response.headers);
-                        // alert('error');
-                        // this.carts = response.data;
-                    } else if (error.request) {
-                        // The request was made but no response was received
-                        console.info(error.request);
-                        alert('error');
-                    } else {
-                        // Something happened in setting up the request that triggered an Error
-                        console.info("Error", error.message);
-                        alert('error');
-                    }
-                });
-        },
+        // payment() {
+        //     const verify_payment = 1;
+        //     let id_purchase = this.cart.id_purchase;
+        //     let id_customer = localStorage.getItem('id');
+        //     axios
+        //         .put(`/user/purchase/payment/${id_purchase}`, {
+        //             verify_payment: 1,
+        //             id_customer: id_customer,
+        //             invoice_number: this.cart.invoice_number,
+        //             file_name: this.cart.img,
+        //         }, {
+        //             headers: {
+        //                 'Content-Type': 'multipart/form-data'
+        //             }
+        //         })
+        //         .then((response) => {
+        //             // alert(response);
+        //             console.log(response)
+        //             window.location.href = '/user/order/complete'
+        //         })
+        //         .catch(function (error) {
+        //             if (error.response) {
+        //                 // Request made and server responded
+        //                 console.info(error.response.data);
+        //                 console.info(error.response.status);
+        //                 console.info(error.response.headers);
+        //                 // alert('error');
+        //                 // this.carts = response.data;
+        //             } else if (error.request) {
+        //                 // The request was made but no response was received
+        //                 console.info(error.request);
+        //                 alert('error');
+        //             } else {
+        //                 // Something happened in setting up the request that triggered an Error
+        //                 console.info("Error", error.message);
+        //                 alert('error');
+        //             }
+        //         });
+        // }
+    },
+    handleFileObject() {
+        this.images = this.$refs.file.files[0]
+        this.imagesName = this.images.name
     }
 });

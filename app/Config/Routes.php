@@ -143,10 +143,12 @@ $routes->group('api', function ($routes) {
 			$routes->get('all-json', 'ProductController::getAllProductJSON');
 			$routes->get('detail-json/(:any)', 'ProductController::productDetailJSON/$1');
 		});
+
 		$routes->group('customer', function ($routes) {
 			$routes->get('customer-json', 'CustomerController::customerJSON');
 			$routes->get('feedback-json', 'CustomerController::feedbackJSON');
 		});
+
 		$routes->group('cart', function ($routes) {
 			$routes->get('detail-json/(:any)', 'ShoppingCartController::get_cartJSON/$1');
 		});
@@ -154,6 +156,7 @@ $routes->group('api', function ($routes) {
 		$routes->group('payment', function ($routes) {
 			$routes->get('list-json', 'PurchaseController::paymentListJSON');
 			$routes->get('detail/(:any)', 'PurchaseController::paymentDetailJSON/$1');
+			$routes->delete('cancel-payment', 'PurchaseController::cancelPaymentJSON/');
 		});
 	});
 
@@ -162,7 +165,6 @@ $routes->group('api', function ($routes) {
 		$routes->put('update-status-purchase/(:any)', 'AdminController::updateStatusPurchase/$1');
 	});
 });
-
 
 
 /*

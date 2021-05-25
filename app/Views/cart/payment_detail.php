@@ -27,17 +27,22 @@
                         <div class="d-flex">
                             <div class="w-50">
                                 <p>Nama Pembeli</p>
-                                <input type="text" placeholder="Contoh : Alian" class="form-control" require>
+                                <input type="text" placeholder="Contoh : Customerxx" class="form-control" require id="customer_name">
                             </div>
 
                             <div class="w-50">
                                 <p>No. Rekening Pembeli</p>
-                                <input type="text" placeholder="123198312" class="form-control" require>
+                                <input type="text" placeholder="12345xx" class="form-control" require id="customer_rek">
                             </div>
                         </div>
-
+                        <div class="mt-3 mb-3">
+                            <p>Alamat Pengiriman</p>
+                            <input type="text" placeholder="Jl.Customerxx" class="form-control" require id="customer_address">
+                        </div>
+                        <div class="mt-3 mb-3">
+                            <p>Sistem Pengiriman : * Saat ini hanya masih bisa menggunakan sistem COD</p>
+                        </div>
                     </div>
-
                 </div>
 
                 <div class="col-md-6 p-3">
@@ -61,8 +66,16 @@
                         </table>
                         <div class="input-group mt-3">
                             <div class="custom-file">
-                                <p>Upload Bukti Pembayaran (.jpg, .png)</p>
-                                <input type="file" class="custom-file-input" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04">
+                                <div>
+                                    <p>Upload Bukti Pembayaran (.jpg, .png) via whatsapp</p>
+                                    <a href="https://api.whatsapp.com/send?phone=62821-6854-0447&text=Halo%20kak%20!%20berikut%20lampiran%20bukti%20pembayaran%20make%20i%20roni%20nya" class="nav-link" target="_blank">Upload Disini</a>
+                                </div>
+                                <!-- <form enctype="multipart/form-data">
+                                    <input type="file" class="form-control" ref="file" @change="handleFileObject()">
+                                </form> -->
+                                <!-- <div class="form-row">
+                                    <input type="file" class="form-control" id="customFile" ref="file" @change="handleFileObject()"> {{ imgname }}
+                                </div> -->
                             </div>
                         </div>
                     </div>

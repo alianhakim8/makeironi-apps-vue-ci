@@ -6,7 +6,6 @@ use App\Models\PurchaseModel;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\I18n\Time;
 
-
 class PurchaseController extends BaseController
 {
     use ResponseTrait;
@@ -72,14 +71,15 @@ class PurchaseController extends BaseController
             $json = $this->request->getJSON();
 
             $data = [
-                'status_payment' => $json->status_payment,
+                'verify_payment' => $json->verify_payment,
             ];
         } else {
             $data = [
-                'status_payment' => $this->request->getPost('status_payment'),
+                'verify_payment' => $this->request->getPost('verify_payment'),
             ];
         }
-        // var_dump($id_purchase, $data);
+
+        // var_dump($id_purchase, $data, $file);
         // die;
         $this->model->update($id_purchase, $data);
         return json_encode([
@@ -129,5 +129,18 @@ class PurchaseController extends BaseController
     {
         $result = $this->model->findAll();
         return json_encode($result);
+    }
+
+    public function cancelPaymentJSON()
+    {
+        if ($this->request->getJSON()) {
+            $json = $this->request->getJSON();
+            var_dump($json);
+            die;
+            return json_encode([
+                'message' => 'Pembayaran dibatalkan'
+            ]);
+            $this->model->query('CALL cancel_payment(' . $json->invoice_number . ')');
+        }
     }
 }
