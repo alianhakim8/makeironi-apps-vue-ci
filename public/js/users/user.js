@@ -1,5 +1,4 @@
-// start app
-let login = new Vue({
+let auth = new Vue({
     el: "#appLogin",
     data: {
         user: {
@@ -22,27 +21,27 @@ let login = new Vue({
     },
     mounted() {
         this.logged_in = localStorage.getItem("email");
-        axios
-            .get("/user/auth/check_user/" + this.logged_in)
-            .then((response) => {
-                // console.log(response.data);
-                console.log(response.data.logged_in);
-            })
-            .catch(function (error) {
-                if (error.response) {
-                    // Request made and server responded
-                    // console.log(error.response.data);
-                    // console.log(error.response.status);
-                    // console.log(error.response.headers);
-                    console.log(error.response.data.logged_in);
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    console.log(error.request);
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    console.log("Error", error.message);
-                }
-            });
+        // axios
+        //     .get("/user/auth/check_user/" + this.logged_in)
+        //     .then((response) => {
+        //         // console.log(response.data);
+        //         console.log(response.data.logged_in);
+        //     })
+        //     .catch(function (error) {
+        //         if (error.response) {
+        //             // Request made and server responded
+        //             // console.log(error.response.data);
+        //             // console.log(error.response.status);
+        //             // console.log(error.response.headers);
+        //             console.log(error.response.data.logged_in);
+        //         } else if (error.request) {
+        //             // The request was made but no response was received
+        //             console.log(error.request);
+        //         } else {
+        //             // Something happened in setting up the request that triggered an Error
+        //             console.log("Error", error.message);
+        //         }
+        //     });
         this.cart_count();
     },
     created() {
@@ -60,15 +59,6 @@ let login = new Vue({
                         password: this.user.password,
                     })
                     .then(function (response) {
-                        // if (response.data.code === 201) {
-                        //     login._data.showModal = false;
-                        //     localStorage.setItem("id", response.data.id);
-                        //     localStorage.setItem("email", response.data.email);
-                        //     localStorage.setItem("name", response.data.name);
-                        //     localStorage.setItem('token', response.data.token);
-                        //     login.reloadPage();
-                        // }
-                        console.log(response.data.code);
                         if (response.data.code == 201) {
                             localStorage.setItem("id", response.data.id);
                             localStorage.setItem("email", response.data.email);
@@ -83,8 +73,8 @@ let login = new Vue({
                             //   console.log(error.response.data);
                             //   console.log(error.response.status);
                             //   console.log(error.response.headers);
-                            login._data.error = true;
-                            login._data.errorMessage = error.response.data.message;
+                            auth._data.error = true;
+                            auth._data.errorMessage = error.response.data.message;
                         } else if (error.request) {
                             // The request was made but no response was received
                             console.log(error.request);
